@@ -621,7 +621,7 @@
   <footer id="siteFooter">Designed By Ahmed Bin Rashid School Version 1.112027</footer>
 
   <script>
-  const API_URL = 'PASTE_TEST_APPS_SCRIPT_WEB_APP_URL_HERE'; // TEST ONLY: never use the production deployment URL
+  const API_URL = 'https://script.google.com/macros/s/AKfycby89VmsjmKgjIE88Cr4oHbeANArdPdr1-7m6HbU_53-DVYR2Ur6wP9TTLLZnka4QmKK1A/exec'; // TEST ONLY: never use the production deployment URL
   const VP_PHONE = ""; // Fill only with a test number if needed
   const PRINCIPAL_PHONE = ""; // Fill only with a test number if needed
   const SUBJECTS = ["مدير المدرسة", "مساعد مدير المدرسة للشؤون الأكاديمية", "مساعد مدير المدرسة للشؤون الإدارية", "اللغة العربية", "اللغة الإنجليزية", "الرياضيات", "العلوم", "العلوم الاجتماعية", "الفنون البصرية", "التربية الرياضية", "تكنولوجيا المعلومات", "العلوم الشرعية"];
@@ -1617,14 +1617,14 @@
     if (!statusEl || !enableBtn) return;
 
     const firebaseConfig = {
-      apiKey: "REPLACE_WITH_FIREBASE_API_KEY",
-      authDomain: "REPLACE_WITH_FIREBASE_AUTH_DOMAIN",
-      projectId: "REPLACE_WITH_FIREBASE_PROJECT_ID",
-      storageBucket: "REPLACE_WITH_FIREBASE_STORAGE_BUCKET",
-      messagingSenderId: "REPLACE_WITH_FIREBASE_MESSAGING_SENDER_ID",
-      appId: "REPLACE_WITH_FIREBASE_APP_ID"
+      apiKey: "AIzaSyDPyoYHZk5bfoiepl4IRSBvOZ75Yvzu2yY",
+      authDomain: "school-permissions-push-test.firebaseapp.com",
+      projectId: "school-permissions-push-test",
+      storageBucket: "school-permissions-push-test.firebasestorage.app",
+      messagingSenderId: "181978320458",
+      appId: "1:181978320458:web:86b855dabeaaf3f9a360b3"
     };
-    const vapidKey = "REPLACE_WITH_PUBLIC_VAPID_KEY";
+    const vapidKey = "BDv7Nh4CNme8wE_1SXAjH3nbXW-z-ALFGYXfMcOfcRUn6z_ty0UTgR3gvgViIa1WB63z2nsNrkuyclN5pwQ1_EE";
 
     function setStatus(message, isError = false) {
       statusEl.textContent = 'الحالة: ' + message;
