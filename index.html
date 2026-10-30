@@ -361,6 +361,15 @@
       </div>
     </div>
 
+    <div class="animated-wrapper hidden" id="permissionLandingCard">
+      <div class="card">
+        <div class="header-title"><h1>طلب استئذان</h1><p>اختر الخدمة المطلوبة</p></div>
+        <button class="btn btn-primary" type="button" style="display:block;width:100%;margin:10px 0;padding:16px;font-size:18px;font-weight:900" onclick="showPermissionNewRequest()">📝 تسجيل طلب جديد</button>
+        <button class="btn btn-outline" type="button" style="display:block;width:100%;margin:10px 0;padding:16px;font-size:18px;font-weight:900" onclick="showTrackingScreen()">🔎 تتبع حالة طلب قديم</button>
+        <button class="btn btn-outline" type="button" onclick="backToHome()">العودة للواجهة الرئيسية</button>
+      </div>
+    </div>
+
     <div class="animated-wrapper" id="loginCard">
       <div class="card">
         <div class="header-title">
@@ -735,7 +744,7 @@
     currentSessionToken = ''; currentSubstituteSession = ''; currentRequesterSession = '';
     const staleApprovalWa = document.getElementById('approvalWhatsAppFallback'); if (staleApprovalWa) { staleApprovalWa.hidden = true; staleApprovalWa.classList.add('hidden'); staleApprovalWa.onclick = null; }
     try { sessionStorage.removeItem('sp_session_token'); } catch (_) {}
-    ['trackScreen','formScreen','approvalScreen','adminDashboard','employeeFormScreen','leaveLoginCard','leaveFormCard','leaveLandingCard','loginCard'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+    ['trackScreen','formScreen','approvalScreen','adminDashboard','employeeFormScreen','leaveLoginCard','leaveFormCard','leaveLandingCard','permissionLandingCard','loginCard'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
     const portal = document.getElementById('employeePortal');
     if (portal) { portal.classList.remove('hidden'); portal.style.display = 'none'; }
     const home = document.getElementById('homeScreen');
@@ -799,19 +808,24 @@
   function continueRegisteredToPermission() {
     if (!registeredEmployeeFromHome) return;
     openPermissionApp();
+    document.getElementById('loginCard').classList.add('hidden');
+    document.getElementById('permissionLandingCard').classList.remove('hidden');
+  }
+
+  function showPermissionNewRequest() {
+    document.getElementById('permissionLandingCard').classList.add('hidden');
+    document.getElementById('trackScreen').classList.add('hidden');
+    document.getElementById('loginCard').classList.remove('hidden');
     const input = document.getElementById('empIdInput');
-    if (input) input.value = String(registeredEmployeeFromHome.employeeId || registeredEmployeeFromHome.personalId || '');
-    verifyEmp();
+    if (input) {
+      input.value = String(registeredEmployeeFromHome?.employeeId || registeredEmployeeFromHome?.personalId || '');
+      input.focus();
+    }
   }
 
   function continueRegisteredToLeave() {
     if (!registeredEmployeeFromHome) return;
     openLeaveApp();
-    document.getElementById('leaveLandingCard').classList.add('hidden');
-    document.getElementById('leaveLoginCard').classList.remove('hidden');
-    const input = document.getElementById('leaveEmployeeId');
-    if (input) input.value = String(registeredEmployeeFromHome.employeeId || registeredEmployeeFromHome.personalId || '');
-    verifyLeaveEmp();
   }
 
   function registerAnotherEmployee() {
@@ -849,7 +863,7 @@
     document.getElementById('homeScreen').style.display = 'none';
     const portal = document.getElementById('employeePortal');
     portal.classList.remove('hidden'); portal.style.display = 'flex';
-    ['leaveLoginCard','leaveFormCard','formScreen','trackScreen','approvalScreen','adminDashboard','employeeFormScreen','leaveLandingCard'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
+    ['leaveLoginCard','leaveFormCard','formScreen','trackScreen','approvalScreen','adminDashboard','employeeFormScreen','leaveLandingCard','permissionLandingCard'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.add('hidden'); });
     document.getElementById('loginCard').classList.remove('hidden');
     const err = document.getElementById('loginError'); if (err) err.textContent = '';
     const inp = document.getElementById('empIdInput'); if (inp) { inp.value = ''; inp.focus(); }
@@ -868,7 +882,7 @@
     const tr = document.getElementById('leaveLandingTrackId'); if (tr) tr.value = '';
   }
 
-  function showLeaveNewRequest(){ document.getElementById('leaveLandingCard').classList.add('hidden'); document.getElementById('leaveLoginCard').classList.remove('hidden'); }
+  function showLeaveNewRequest(){ document.getElementById('leaveLandingCard').classList.add('hidden'); document.getElementById('leaveLoginCard').classList.remove('hidden'); const input=document.getElementById('leaveEmployeeId'); if(input && registeredEmployeeFromHome) input.value=String(registeredEmployeeFromHome.employeeId || registeredEmployeeFromHome.personalId || ''); }
   function showLeaveOldTracking(){ const p=document.getElementById('leaveLandingTracking'); p.classList.toggle('hidden'); if(!p.classList.contains('hidden')) document.getElementById('leaveLandingTrackId').focus(); }
 
   function escapeHtml(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, ch => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch])); }
@@ -1063,7 +1077,7 @@
     // employee/approval screens so they cannot appear beneath the result.
     ['loginCard', 'formScreen', 'approvalScreen', 'adminDashboard',
      'employeeFormScreen', 'leaveLoginCard', 'leaveFormCard',
-     'leaveLandingCard', 'leaveLandingTracking'].forEach(id => {
+     'leaveLandingCard', 'leaveLandingTracking', 'permissionLandingCard'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.classList.add('hidden');
     });
@@ -1110,7 +1124,7 @@
     const subjectSelect = document.getElementById('subjectSelect'); const subjectGroup = document.getElementById('subjectGroup'); const routingNote = document.getElementById('routingNote'); if (subjectSelect) { subjectSelect.value = ''; subjectSelect.disabled = sendDirectlyToVP; subjectSelect.required = !sendDirectlyToVP; } if (subjectGroup) subjectGroup.style.display = sendDirectlyToVP ? 'none' : 'block'; if (routingNote) { routingNote.innerText = sendDirectlyToVP ? 'سيُرسل الطلب إلى المسؤول المباشر وفق مسار الاعتماد المعتمد.' : 'سيُرسل الإشعار إلى المسؤول المباشر وفق المادة والكادر ومسار الاعتماد.'; }
     let balance = 600; try { const res = await fetch(`${API_URL}?action=getBalance&empId=${emp.employeeId}`); const bal = await res.json(); if (bal && typeof bal.balance === 'number') balance = bal.balance; } catch(e) { } currentBalance = balance;
     document.getElementById('empFullInfo').innerHTML = `<p>مرحباً، <strong>${escapeHtml(emp.name)}</strong></p><p>المسمى: <span>${escapeHtml(emp.jobTitle || '')}</span></p><p>الجنسية: <span>${escapeHtml(emp.nationality || '')}</span></p><p>الرقم الوظيفي: <span>${escapeHtml(emp.employeeId || '')}</span></p><p>الرقم الشخصي: <span>${escapeHtml(emp.personalId || '')}</span></p><p>الهاتف: <span>${escapeHtml(emp.phone || '')}</span></p><p>البريد: <span>${escapeHtml(emp.email || '')}</span></p><p>الرصيد المتبقي: <span class="balance-badge">${balance} دقيقة</span></p>`;
-    document.getElementById('loginCard').classList.add('hidden'); document.getElementById('formScreen').classList.remove('hidden'); document.getElementById('permDate').valueAsDate = new Date(); if (document.getElementById('coverageEntries').children.length === 0) addCoverageEntry(); populateAdminSubstitutes(); checkBalanceState(balance); if (balance > 0) updateCoverageMode();
+    document.getElementById('trackScreen')?.classList.add('hidden'); document.getElementById('loginCard').classList.add('hidden'); document.getElementById('formScreen').classList.remove('hidden'); document.getElementById('permDate').valueAsDate = new Date(); if (document.getElementById('coverageEntries').children.length === 0) addCoverageEntry(); populateAdminSubstitutes(); checkBalanceState(balance); if (balance > 0) updateCoverageMode();
   }
 
   function isTeacherOrCoordinator(emp) { const job = normalizeArabic_(emp && emp.jobTitle || ''); if (/مدير|نائب|سكرتير|اداري|اداريه|محاسب|امين مخزن|موظف استقبال/.test(job)) return false; if (/معلم|معلمه|مدرس|مدرسه|منسق|منسقه|teacher|educator|instructor|coordinator/.test(job)) return true; return !job; }
@@ -1479,6 +1493,10 @@
     if(result.success) {
       document.getElementById('approveMsg').innerText = currentRole === 'substitute' ? `✅ ${result.message || 'تم تسجيل قرار البديل'}` : `✅ تم تسجيل القرار: ${result.newStatus}`; document.getElementById('approveMsg').style.color = "#28a745";
       if (decision === 'approved' && ['coordinator', 'vp', 'vp_admin', 'principal'].includes(currentRole)) {
+        // Ensure the employee directory is loaded before resolving the next approver's phone.
+        if (!Array.isArray(ALL_EMPLOYEES) || ALL_EMPLOYEES.length === 0) {
+          try { await loadAllEmployees(); } catch (phoneLoadError) { console.warn('تعذر تحديث دليل أرقام الموظفين:', phoneLoadError); }
+        }
         const isAdminRequest = requestData && (String(requestData.coverageType) === 'إداري' || String(requestData.subject) === 'كادر إداري');
         let recipientPhone = '', recipientRole = '';
         if (currentRole === 'coordinator') {
@@ -1504,7 +1522,11 @@
     } else if (wanted === normalizeArabic_('النائب الإداري')) {
       person = staff.find(e => { const j = normalizeArabic_(e.jobTitle || ''); return (/نائب/.test(j) && /اداري/.test(j)) || /مساعد مدير المدرسه للشؤون الاداريه/.test(j); });
     } else if (wanted === normalizeArabic_('مدير المدرسة')) {
-      person = staff.find(e => { const j = normalizeArabic_(e.jobTitle || ''); return /مدير المدرسه/.test(j) && !/مساعد|نائب/.test(j); });
+      person = staff.find(e => {
+        const j = normalizeArabic_(e.jobTitle || '');
+        return (/مدير/.test(j) && /مدرسه/.test(j) && !/مساعد|نائب/.test(j)) ||
+          (normalizeArabic_(e.name || '') === normalizeArabic_('أحمد إسماعيل عبد المنعم الدسوقي'));
+      });
     }
     if (!person || !person.phone) return '';
     let phone = String(person.phone).replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/[^0-9]/g, '');
