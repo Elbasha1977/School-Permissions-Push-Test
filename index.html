@@ -256,7 +256,7 @@
             <div id="registeredEmployeeWelcome" style="margin-top:8px;font-weight:700;"></div>
           </div>
           <div id="notificationLogPanel" class="hidden" style="background:#fff;border:1px solid #d7dee8;border-radius:14px;padding:14px;margin-bottom:16px;color:#263238;">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;"><strong><i class="fa-solid fa-bell" aria-hidden="true"></i> سجل الإشعارات الخاص بك</strong><button type="button" class="btn btn-sm btn-outline" onclick="showNotificationLog()">تحديث</button></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;"><strong><i class="fa-solid fa-bell" aria-hidden="true"></i> سجل الإشعارات الخاص بك</strong><div style="display:flex;gap:8px;flex-wrap:wrap;"><button type="button" class="btn btn-sm btn-outline" onclick="markAllNotificationsRead()">✓ تحديد الكل كمقروء</button><button type="button" class="btn btn-sm btn-outline" onclick="showNotificationLog()">تحديث</button><button type="button" class="btn btn-sm btn-danger" onclick="closeNotificationLog()">إغلاق ✕</button></div></div>
             <div id="notificationLogList" style="margin-top:10px;">اضغط على سجل الإشعارات لعرض السجل.</div>
           </div>
           <div style="font-size:20px;font-weight:800;color:#fff;text-align:center;">اختر الخدمة المطلوبة</div>
@@ -714,7 +714,7 @@
   </footer>
 
   <script>
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxszKD_QAdqHv75NVYvY4X9yCZ9dTkabZ4RdZUwIa9vApV5AuVxK6yv2dgX9IGItd0P6w/exec'; // TEST ONLY: never use the production deployment URL
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxs9sjxP4AIcVZ3nuu3mWGDys1w1Ws-Rmf3nErNOBaPpp8c1aN_F7Q1GW7Ki9ToE6GhtQ/exec'; // TEST ONLY: never use the production deployment URL
   const VP_PHONE = ""; // Fill only with a test number if needed
   const PRINCIPAL_PHONE = ""; // Fill only with a test number if needed
   const SUBJECTS = ["مدير المدرسة", "مساعد مدير المدرسة للشؤون الأكاديمية", "مساعد مدير المدرسة للشؤون الإدارية", "اللغة العربية", "اللغة الإنجليزية", "الرياضيات", "العلوم", "العلوم الاجتماعية", "الفنون البصرية", "التربية الرياضية", "تكنولوجيا المعلومات", "العلوم الشرعية"];
@@ -1691,6 +1691,24 @@
     const fd = new URLSearchParams(); fd.append('action','markNotificationRead'); fd.append('employeeId',currentEmp.employeeId || ''); fd.append('personalId',currentEmp.personalId || ''); fd.append('notificationId',notificationId);
     try { const response = await fetch(API_URL,{method:'POST',body:fd,headers:{'Content-Type':'application/x-www-form-urlencoded'}}); const result = await response.json(); if (!result.success) throw new Error(result.message || 'تعذر تحديث الإشعار.'); await showNotificationLog(); }
     catch(error) { alert(error.message || 'تعذر تحديث الإشعار.'); }
+  }
+
+  function closeNotificationLog() {
+    const panel = document.getElementById('notificationLogPanel');
+    if (panel) panel.classList.add('hidden');
+  }
+  async function markAllNotificationsRead() {
+    if (!currentEmp || !currentEmp.employeeId || !currentEmp.personalId) return;
+    const fd = new URLSearchParams();
+    fd.append('action','markAllNotificationsRead');
+    fd.append('employeeId',currentEmp.employeeId || '');
+    fd.append('personalId',currentEmp.personalId || '');
+    try {
+      const response = await fetch(API_URL,{method:'POST',body:fd,headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+      const result = await response.json();
+      if (!result.success) throw new Error(result.message || 'تعذر تحديد الإشعارات كمقروءة.');
+      await showNotificationLog();
+    } catch(error) { alert(error.message || 'تعذر تحديث الإشعارات.'); }
   }
 
   async function switchAdminTab(tab) {
