@@ -714,7 +714,7 @@
   </footer>
 
   <script>
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxs9sjxP4AIcVZ3nuu3mWGDys1w1Ws-Rmf3nErNOBaPpp8c1aN_F7Q1GW7Ki9ToE6GhtQ/exec'; // TEST ONLY: never use the production deployment URL
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxszKD_QAdqHv75NVYvY4X9yCZ9dTkabZ4RdZUwIa9vApV5AuVxK6yv2dgX9IGItd0P6w/exec'; // TEST ONLY: never use the production deployment URL
   const VP_PHONE = ""; // Fill only with a test number if needed
   const PRINCIPAL_PHONE = ""; // Fill only with a test number if needed
   const SUBJECTS = ["مدير المدرسة", "مساعد مدير المدرسة للشؤون الأكاديمية", "مساعد مدير المدرسة للشؤون الإدارية", "اللغة العربية", "اللغة الإنجليزية", "الرياضيات", "العلوم", "العلوم الاجتماعية", "الفنون البصرية", "التربية الرياضية", "تكنولوجيا المعلومات", "العلوم الشرعية"];
@@ -975,8 +975,8 @@
         }
       }
     }
-    const details = { requestKind: 'leave', leaveType, startDate, endDate, startDay: dateDayArabic(startDate), endDay: dateDayArabic(endDate), days, reason, applicationDate, employeeName: currentLeaveEmp.name, jobTitle: currentLeaveEmp.jobTitle, subject, employeeId: currentLeaveEmp.employeeId, coordinatorName: (SUBJECT_COORDINATORS[subject] && SUBJECT_COORDINATORS[subject].name) || '', signatureText: 'تم التوقيع إلكترونيًا', coverageRequired: isCasualLeave && !isAdminCadre, leaveCoverage: leaveCoverage, adminCoverage: leaveAdminCoverage, adminSubstitute: leaveAdminSubstitute, adminSubstituteEmpId: leaveAdminSubstituteEmpId };
-    const data={ employeeId:currentLeaveEmp.employeeId,empId:currentLeaveEmp.employeeId, name:currentLeaveEmp.name,jobTitle:currentLeaveEmp.jobTitle, phone:currentLeaveEmp.phone||'',email:currentLeaveEmp.email||'', subject:effectiveSubject,coverageType:isAdminCadre?'إداري':'حصص', permissionType:'طلب إجازة',date:applicationDate,exitTime:'',returnTime:'', reason:`${leaveType} من ${startDate} إلى ${endDate}${reason ? ': ' + reason : ''}`, coverage:`طلب إجازة ${leaveType} من ${startDate} إلى ${endDate}`, coverageDetails:JSON.stringify(details),duration:days,consent:true, adminCoverage: leaveAdminCoverage || '', adminSubstitute: leaveAdminSubstitute || '', adminSubstituteEmpId: leaveAdminSubstituteEmpId || '' };
+    const details = { requestKind: 'leave', leaveType, startDate, endDate, startDay: dateDayArabic(startDate), endDay: dateDayArabic(endDate), days, reason, applicationDate, employeeName: currentLeaveEmp.name, jobTitle: currentLeaveEmp.jobTitle, subject, employeeId: currentLeaveEmp.employeeId, coordinatorName: (SUBJECT_COORDINATORS[subject] && SUBJECT_COORDINATORS[subject].name) || '', signatureText: 'تم التوقيع إلكترونيًا', coverageRequired: false, leaveCoverage: [], adminCoverage: '', adminSubstitute: '', adminSubstituteEmpId: '' };
+    const data={ employeeId:currentLeaveEmp.employeeId,empId:currentLeaveEmp.employeeId, name:currentLeaveEmp.name,jobTitle:currentLeaveEmp.jobTitle, phone:currentLeaveEmp.phone||'',email:currentLeaveEmp.email||'', subject:effectiveSubject,coverageType:'بدون تغطية', permissionType:'طلب إجازة',date:applicationDate,exitTime:'',returnTime:'', reason:`${leaveType} من ${startDate} إلى ${endDate}${reason ? ': ' + reason : ''}`, coverage:`طلب إجازة ${leaveType} من ${startDate} إلى ${endDate}`, coverageDetails:JSON.stringify(details),duration:days,consent:true, adminCoverage: '', adminSubstitute: '', adminSubstituteEmpId: '' };
     const btn=document.getElementById('submitLeaveBtn'); btn.disabled=true; btn.textContent='جارٍ إرسال الطلب...';
     try {
       const fd=new URLSearchParams(); fd.set('action','submit'); fd.set('data',JSON.stringify(data)); const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:fd.toString()}); const out=await res.json();
@@ -1306,9 +1306,9 @@
   }
 
   async function submitRequest() {
-    if (currentBalance <= 0) { alert('عذراً، لقد نفذ رصيدك الشهري. لا يمكنك إرسال طلب إلكتروني. يمكنك التقدم بطلب ورقي.'); return; } const btn = document.getElementById('submitBtn'); const successBox = document.getElementById('successBox'); const waBtn = document.getElementById('waBtn'); if (!currentEmp) return alert('يرجى تسجيل الدخول أولاً.'); const date = document.getElementById('permDate').value; const exitTime = document.getElementById('exitTime').value; const returnTime = document.getElementById('returnTime').value; const permissionType = document.getElementById('permType').value; const reason = document.getElementById('reason').value.trim(); if (!date) return alert('يرجى تحديد التاريخ.'); if (!exitTime || !returnTime) return alert('يرجى تحديد الأوقات.'); if (!reason && !adminMode) return alert('يرجى كتابة سبب الاستئذان.'); if (adminMode && !document.getElementById('adminConsent').checked) return alert('يرجى تأكيد التعهد بعدم وجود أعمال إدارية أثناء وقت الاستئذان.'); const subjectSelect = document.getElementById('subjectSelect'); if (!subjectSelect.disabled && !subjectSelect.value) return alert('يرجى اختيار المادة.'); const adminMode = isAdministrativeCadreSelected(); const noCoverage = Boolean(document.getElementById('noCoverageNeeded')?.checked);
+    if (currentBalance <= 0) { alert('عذراً، لقد نفذ رصيدك الشهري. لا يمكنك إرسال طلب إلكتروني. يمكنك التقدم بطلب ورقي.'); return; } const btn = document.getElementById('submitBtn'); const successBox = document.getElementById('successBox'); const waBtn = document.getElementById('waBtn'); if (!currentEmp) return alert('يرجى تسجيل الدخول أولاً.'); const date = document.getElementById('permDate').value; const exitTime = document.getElementById('exitTime').value; const returnTime = document.getElementById('returnTime').value; const permissionType = document.getElementById('permType').value; const reason = document.getElementById('reason').value.trim(); const adminMode = isAdministrativeCadreSelected(); if (!date) return alert('يرجى تحديد التاريخ.'); if (isWeekendDate(date)) return alert('يرجى اختيار يوم من الأحد إلى الخميس؛ الجمعة والسبت مستبعدان.'); if (!exitTime || !returnTime) return alert('يرجى تحديد الأوقات.'); if (!reason && !adminMode) return alert('يرجى كتابة سبب الاستئذان.'); if (adminMode && !document.getElementById('adminConsent').checked) return alert('يرجى تأكيد التعهد بعدم وجود أعمال إدارية أثناء وقت الاستئذان.'); const subjectSelect = document.getElementById('subjectSelect'); if (!subjectSelect.disabled && !subjectSelect.value) return alert('يرجى اختيار المادة.'); const noCoverage = Boolean(document.getElementById('noCoverageNeeded')?.checked);
     let coverageArr = []; let adminCoverage = ''; let adminSubstitute = ''; let adminSubstituteEmpId = '';
-    if (adminMode && !noCoverage) { adminCoverage = document.getElementById('adminCoverageDetails').value.trim(); const sel = document.getElementById('adminSubstituteSelect'); adminSubstitute = sel.value; adminSubstituteEmpId = sel.selectedOptions[0]?.dataset?.empId || ''; if (!adminCoverage) return alert('اكتب الأعمال الإدارية.'); if (!adminSubstitute) return alert('اختر الموظف الإداري البديل.'); if (!document.getElementById('adminConsent').checked) return alert('أكد التنسيق مع الموظف الإداري البديل.'); } else if (!adminMode && !noCoverage) { if (!document.getElementById('teacherConsent').checked) return alert('يجب الموافقة على التعهد.'); coverageArr = collectCoverageData(); if (!coverageArr.length) return alert('أضف حصة تغطية واحدة على الأقل.'); if (coverageArr.some(x => x._invalid)) return alert('يرجى اختيار الصف لكل حصة تغطية.'); }
+    if (adminMode) { adminCoverage = ''; adminSubstitute = ''; adminSubstituteEmpId = ''; if (!document.getElementById('adminConsent').checked) return alert('يرجى تأكيد التعهد بعدم وجود أعمال إدارية أثناء وقت الاستئذان.'); } else if (!noCoverage) { if (!document.getElementById('teacherConsent').checked) return alert('يجب الموافقة على التعهد.'); coverageArr = collectCoverageData(); if (!coverageArr.length) return alert('أضف حصة تغطية واحدة على الأقل.'); if (coverageArr.some(x => x._invalid)) return alert('يرجى اختيار الصف لكل حصة تغطية.'); }
     const duration = calcDuration(); const coverageText = coverageArr.map(c => `الصف: ${c.className} | المادة: ${c.subject} | اليوم: ${c.day} | التاريخ: ${c.date} | الحصة: ${c.period} | البديل: ${c.substituteTeacher} | الرقم: ${c.substituteEmpId}`).join('\n');
     const data = { employeeId: currentEmp.employeeId, empId: currentEmp.employeeId, name: currentEmp.name || '', jobTitle: currentEmp.jobTitle || '', phone: currentEmp.phone || '', email: currentEmp.email || '', subject: subjectSelect.disabled ? 'إرسال مباشر للنائب الأكاديمي' : subjectSelect.value, coverageType: adminMode ? 'إداري' : 'حصص', adminCoverage: adminMode ? 'لا توجد أعمال إدارية أثناء وقت الاستئذان.' : adminCoverage, adminSubstitute: '', adminSubstituteEmpId: '', permissionType, date, exitTime, returnTime, reason, coverage: adminMode ? 'تعهد: لا توجد أعمال إدارية أثناء وقت الاستئذان.' : (noCoverage ? 'لا توجد حصص تتطلب التغطية.' : coverageText), coverageDetails: JSON.stringify(coverageArr), noCoverageNeeded: noCoverage, duration, consent: adminMode ? document.getElementById('adminConsent').checked : (noCoverage ? true : document.getElementById('teacherConsent').checked), substituteMsgSent: sessionStorage.getItem('substituteMsgSent') === 'true' };
     const originalText = btn ? btn.innerText : 'إرسال الطلب'; if (btn) { btn.disabled = true; btn.innerText = 'جارٍ حفظ الطلب...'; } if (successBox) successBox.classList.add('hidden'); if (waBtn) waBtn.style.display = 'none';
@@ -2508,28 +2508,9 @@
   }
 
   function updateLeaveCoverageVisibility() {
-    const leaveType = document.getElementById('leaveType')?.value;
-    const subject = document.getElementById('leaveSubject')?.value;
-    const group = document.getElementById('leaveCoverageGroup');
-    const adminGroup = document.getElementById('leaveAdminCoverageGroup');
-
-    if (!group || !adminGroup) return;
-
-    const isCasual = leaveType === 'عارضة';
-    const isAdminCadre = subject === 'كادر إداري';
-
-    if (isCasual) {
-      if (isAdminCadre) {
-        group.classList.add('hidden');
-        adminGroup.classList.remove('hidden');
-      } else {
-        group.classList.remove('hidden');
-        adminGroup.classList.add('hidden');
-      }
-    } else {
-      group.classList.add('hidden');
-      adminGroup.classList.add('hidden');
-    }
+    // Leave requests no longer use lesson or administrative coverage for any leave type.
+    document.getElementById('leaveCoverageGroup')?.classList.add('hidden');
+    document.getElementById('leaveAdminCoverageGroup')?.classList.add('hidden');
   }
 
 
