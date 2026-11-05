@@ -172,7 +172,50 @@
 #pwaInstallOverlay .pwa-install-secondary{width:100%;border:1px solid #cbd5e1;border-radius:13px;padding:11px 16px;background:#fff;color:#334155;font-size:15px;font-weight:700;cursor:pointer;margin-top:9px}
 #pwaInstallOverlay .pwa-install-help{font-size:13px;color:#64748b!important}
 
-  </style>
+  
+
+/* FIX: approval checkbox was inheriting the global input { width:100%; padding:14px } rule */
+#substituteConsentBox { width:100%; min-width:0; box-sizing:border-box; }
+#substituteConsentBox label {
+ display:flex !important; flex-direction:row !important; flex-wrap:nowrap !important;
+ align-items:flex-start !important; justify-content:flex-start !important; gap:10px !important;
+ width:100% !important; min-width:0 !important; margin:0 !important;
+ box-sizing:border-box !important; direction:rtl !important;
+}
+#substituteConsentBox input[type="checkbox"], #substituteConfirmCheck {
+ appearance:auto !important; -webkit-appearance:checkbox !important; display:block !important;
+ flex:0 0 22px !important; width:22px !important; min-width:22px !important;
+ max-width:22px !important; height:22px !important; min-height:22px !important;
+ margin:3px 0 0 !important; padding:0 !important; border:initial !important;
+ border-radius:3px !important; background:initial !important; box-shadow:none !important;
+ box-sizing:border-box !important;
+}
+#substituteConsentBox label > span {
+ display:block !important; flex:1 1 auto !important; width:auto !important;
+ min-width:0 !important; max-width:100% !important; margin:0 !important; padding:0 !important;
+ white-space:normal !important; overflow-wrap:anywhere !important;
+ line-height:1.65 !important; text-align:right !important;
+}
+@media (max-width:600px) {
+ #approvalScreen .card { padding:14px 12px !important; }
+ #requestDetails { width:100% !important; min-width:0 !important; padding:12px !important;
+   overflow:visible !important; box-sizing:border-box !important; }
+ #substituteConsentBox { height:auto !important; min-height:0 !important; max-height:none !important;
+   padding:10px !important; margin:10px 0 !important; overflow:visible !important; }
+}
+
+
+/* === Additional mobile repair for substitute consent confirmation === */
+@media screen and (max-width: 600px) {
+  #approvalScreen, #approvalScreen .card, #requestDetails { width:100% !important; max-width:100% !important; min-width:0 !important; box-sizing:border-box !important; overflow-x:hidden !important; }
+  #substituteConsentBox:not(.hidden) { display:block !important; position:relative !important; width:100% !important; height:auto !important; min-height:0 !important; max-height:none !important; padding:12px !important; margin:12px 0 !important; background:#fff8e8 !important; border:1px solid #e6c56a !important; box-sizing:border-box !important; overflow:visible !important; }
+  #substituteConsentBox > label, #substituteConsentBox > label[style] { display:grid !important; grid-template-columns:24px minmax(0,1fr) !important; align-items:start !important; justify-content:stretch !important; direction:rtl !important; gap:10px !important; width:100% !important; height:auto !important; min-height:0 !important; max-height:none !important; margin:0 !important; padding:0 !important; box-sizing:border-box !important; white-space:normal !important; text-align:right !important; }
+  #substituteConsentBox > label > input#substituteConfirmCheck { display:block !important; appearance:auto !important; -webkit-appearance:checkbox !important; grid-column:1 !important; grid-row:1 !important; flex:none !important; width:24px !important; min-width:24px !important; max-width:24px !important; height:24px !important; min-height:24px !important; margin:2px 0 0 !important; padding:0 !important; box-sizing:border-box !important; }
+  #substituteConsentBox > label > span { display:block !important; grid-column:2 !important; grid-row:1 !important; width:auto !important; min-width:0 !important; max-width:100% !important; height:auto !important; min-height:0 !important; margin:0 !important; padding:0 !important; overflow:visible !important; overflow-wrap:anywhere !important; white-space:normal !important; line-height:1.7 !important; text-align:right !important; box-sizing:border-box !important; }
+  #requestDetails > div[style*="display:flex"] { display:flex !important; flex-wrap:wrap !important; gap:10px !important; }
+  #requestDetails #approveActionBtn, #requestDetails #rejectActionBtn { flex:1 1 130px !important; width:auto !important; min-width:0 !important; max-width:100% !important; box-sizing:border-box !important; white-space:normal !important; }
+}
+</style>
   <meta name="theme-color" content="#12345b">
   <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#123456">
@@ -473,13 +516,6 @@
           <div id="coverageEntries"></div>
           <button type="button" class="btn btn-outline btn-sm" onclick="addCoverageEntry()" style="margin-top:8px;">➕ إضافة حصة تغطية</button>
         </div>
-        <div class="form-group hidden" id="adminCoverageGroup">
-          <label for="adminCoverageDetails">تغطية العمل الإداري</label>
-          <textarea id="adminCoverageDetails" rows="3" placeholder="اكتب الأعمال الإدارية التي سيتولاها الموظف البديل أثناء فترة الاستئذان..."></textarea>
-          <label for="adminSubstituteSelect" style="margin-top:10px;">الموظف الإداري البديل</label>
-          <select id="adminSubstituteSelect" onchange="toggleAdminSubstituteMsgBtn()"><option value="">-- اختر الموظف الإداري البديل --</option></select>
-          <button type="button" id="adminSubstituteMsgBtn" class="btn btn-msg-substitute hidden" onclick="sendAdminSubstituteMsg()">📨 إرسال رسالة للموظف الإداري البديل</button>
-        </div>
         <div class="checkbox-row" id="noCoverageRow" style="background:#fff8e8;border:1px solid #e6c56a;border-radius:8px;padding:10px;margin:10px 0;">
           <input type="checkbox" id="noCoverageNeeded">
           <label for="noCoverageNeeded" id="noCoverageLabel">أؤكد أنه لا توجد لدي حصص أثناء فترة الاستئذان، ولا أحتاج إلى معلم لتغطية الحصص.</label>
@@ -490,7 +526,7 @@
         </div>
         <div class="checkbox-row hidden" id="adminConsentRow">
           <input type="checkbox" id="adminConsent">
-          <label for="adminConsent">أؤكد التنسيق مع الموظف الإداري البديل وتوضيح الأعمال الإدارية المطلوب تغطيتها.</label>
+          <label for="adminConsent">أتعهد بأنه لا توجد لدي أعمال إدارية أثناء وقت الاستئذان.</label>
         </div>
         <button class="btn btn-primary" id="submitBtn" onclick="submitRequest()">إرسال الطلب</button>
         <button class="btn btn-wa" id="waBtn" onclick="sendWhatsApp()">📱 إرسال الطلب للمسؤول المباشر</button>
@@ -507,19 +543,19 @@
   </div>
 
   <div class="secret-buttons" id="secretButtons">
-    <button class="secret-btn" onclick="enterSubstituteApproval()">المعلم/الإداري البديل</button>
+    <button class="secret-btn" onclick="enterSubstituteApproval()">المعلم البديل</button>
     <button class="secret-btn" onclick="askPassword('coordinator')">المنسق</button>
     <button class="secret-btn" onclick="askPassword('vp')">النائب الأكاديمي</button>
     <button class="secret-btn" onclick="askPassword('vp_admin')">النائب الإداري</button>
-    <button class="secret-btn" onclick="askPassword('principal')">المدير</button>
-    <button class="secret-btn" onclick="askPassword('admin')" style="font-size: 0.8rem;">⚙️ إدارة</button>
+    <button class="secret-btn hidden" id="principalRoleButton" onclick="askPassword('principal')">المدير</button>
+    <button class="secret-btn hidden" id="adminRoleButton" onclick="askPassword('admin')" style="font-size: 0.8rem;">⚙️ إدارة</button>
   </div>
 
   <div id="approvalScreen" class="animated-wrapper hidden">
     <div class="card">
       <div class="header-title"><h1 id="approvalTitle">اعتماد الطلبات</h1></div>
       <div id="substituteLoginBox" class="hidden sub-login-box">
-        <h3>دخول المعلم/الإداري البديل</h3>
+        <h3>دخول المعلم البديل</h3>
         <p style="font-size:0.9rem;color:#555;">أدخل رقم الطلب والرقم الوظيفي وكلمة المرور المؤقتة التي استلمتها من مقدم الطلب.</p>
         <div class="form-group"><label>رقم الطلب *</label><input type="text" id="subLoginReqId" placeholder="REQ-..." style="text-align:center;"></div>
         <div class="form-group"><label>الرقم الوظيفي *</label><input type="text" id="subLoginEmpId" placeholder="أدخل رقمك الوظيفي" style="text-align:center;"></div>
@@ -920,8 +956,8 @@
   async function submitLeaveRequest() {
     if(!currentLeaveEmp) return alert('تحقق من بيانات الموظف أولًا.');
     const leaveType=document.getElementById('leaveType').value, subject=document.getElementById('leaveSubject').value; const startDate=document.getElementById('leaveStart').value,endDate=document.getElementById('leaveEnd').value,reason=document.getElementById('leaveReason').value.trim(); const days=inclusiveDays(startDate,endDate);
-    if(!leaveType||!subject||!startDate||!endDate||!reason) return alert('يرجى استكمال نوع الإجازة والمادة/الصفة والتاريخين والسبب.'); if(!days) return alert('تاريخ نهاية الإجازة غير صحيح.');
-    const now=new Date(); const applicationDate=now.toLocaleDateString('en-CA'); const normalizedJob=normalizeArabic_(currentLeaveEmp.jobTitle||''); const isDirectEmployee=/منسق|مشاريع|مسرح/.test(normalizedJob); const effectiveSubject=isDirectEmployee?'إرسال مباشر للنائب الأكاديمي':subject; const isCasualLeave = leaveType === 'عارضة'; const isAdminCadre = subject === 'كادر إداري';
+    if(!leaveType||!subject||!startDate||!endDate) return alert('يرجى استكمال نوع الإجازة والمادة/الصفة والتاريخين.'); if(!days) return alert('تاريخ نهاية الإجازة غير صحيح.');
+    const now=new Date(); const applicationDate=now.toLocaleDateString('en-CA'); const normalizedJob=normalizeArabic_(currentLeaveEmp.jobTitle||''); const isDirectEmployee=/منسق|مشاريع|مسرح/.test(normalizedJob); const effectiveSubject=isDirectEmployee?'إرسال مباشر للنائب الأكاديمي':subject; const isCasualLeave = false; const isAdminCadre = subject === 'كادر إداري';
     let leaveCoverage = []; let leaveAdminCoverage = null; let leaveAdminSubstitute = null; let leaveAdminSubstituteEmpId = null;
     if (isCasualLeave) {
       if (isAdminCadre) {
@@ -940,7 +976,7 @@
       }
     }
     const details = { requestKind: 'leave', leaveType, startDate, endDate, startDay: dateDayArabic(startDate), endDay: dateDayArabic(endDate), days, reason, applicationDate, employeeName: currentLeaveEmp.name, jobTitle: currentLeaveEmp.jobTitle, subject, employeeId: currentLeaveEmp.employeeId, coordinatorName: (SUBJECT_COORDINATORS[subject] && SUBJECT_COORDINATORS[subject].name) || '', signatureText: 'تم التوقيع إلكترونيًا', coverageRequired: isCasualLeave && !isAdminCadre, leaveCoverage: leaveCoverage, adminCoverage: leaveAdminCoverage, adminSubstitute: leaveAdminSubstitute, adminSubstituteEmpId: leaveAdminSubstituteEmpId };
-    const data={ employeeId:currentLeaveEmp.employeeId,empId:currentLeaveEmp.employeeId, name:currentLeaveEmp.name,jobTitle:currentLeaveEmp.jobTitle, phone:currentLeaveEmp.phone||'',email:currentLeaveEmp.email||'', subject:effectiveSubject,coverageType:isAdminCadre?'إداري':'حصص', permissionType:'طلب إجازة',date:applicationDate,exitTime:'',returnTime:'', reason:`${leaveType} من ${startDate} إلى ${endDate}: ${reason}`, coverage:`طلب إجازة ${leaveType} من ${startDate} إلى ${endDate}`, coverageDetails:JSON.stringify(details),duration:days,consent:true, adminCoverage: leaveAdminCoverage || '', adminSubstitute: leaveAdminSubstitute || '', adminSubstituteEmpId: leaveAdminSubstituteEmpId || '' };
+    const data={ employeeId:currentLeaveEmp.employeeId,empId:currentLeaveEmp.employeeId, name:currentLeaveEmp.name,jobTitle:currentLeaveEmp.jobTitle, phone:currentLeaveEmp.phone||'',email:currentLeaveEmp.email||'', subject:effectiveSubject,coverageType:isAdminCadre?'إداري':'حصص', permissionType:'طلب إجازة',date:applicationDate,exitTime:'',returnTime:'', reason:`${leaveType} من ${startDate} إلى ${endDate}${reason ? ': ' + reason : ''}`, coverage:`طلب إجازة ${leaveType} من ${startDate} إلى ${endDate}`, coverageDetails:JSON.stringify(details),duration:days,consent:true, adminCoverage: leaveAdminCoverage || '', adminSubstitute: leaveAdminSubstitute || '', adminSubstituteEmpId: leaveAdminSubstituteEmpId || '' };
     const btn=document.getElementById('submitLeaveBtn'); btn.disabled=true; btn.textContent='جارٍ إرسال الطلب...';
     try {
       const fd=new URLSearchParams(); fd.set('action','submit'); fd.set('data',JSON.stringify(data)); const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:fd.toString()}); const out=await res.json();
@@ -977,13 +1013,13 @@
 
   async function trackLeaveRequestFromLanding(){
     const id=String(document.getElementById('leaveLandingTrackId').value||'').trim(); const out=document.getElementById('leaveLandingTrackStatus'); if(!id){out.textContent='أدخل رقم الطلب أولًا.';out.style.color='#b42318';return;} out.textContent='جارٍ تحميل حالة الطلب...';out.style.color='#174b78'; const fd=new URLSearchParams();fd.append('action','getRequest');fd.append('reqId',id);
-    try{ const r=await fetch(API_URL,{method:'POST',body:fd,headers:{'Content-Type':'application/x-www-form-urlencoded'}}); const x=await r.json(); if(!x.success)throw new Error(x.message||'لم يتم العثور على الطلب.'); const d=x.data||{}; if(String(d.permissionType||'')!=='طلب إجازة')throw new Error('رقم الطلب لا يعود إلى طلب إجازة.'); const labels={pending:'بانتظار موافقة المنسق',coordinator_approved:'تمت موافقة المنسق — بانتظار النائب',vp_pending:'بانتظار موافقة النائب المختص',vp_approved:'تمت موافقة النائب — بانتظار المدير',principal_approved:'معتمد نهائيًا — يمكنك تحميل نموذج الإجازة',principal_rejected:'مرفوض من المدير',vp_rejected:'مرفوض من النائب',coordinator_rejected:'مرفوض من المنسق'}; const st=String(d.status||'pending'); out.innerHTML=`رقم الطلب: ${escapeHtml(d.requestId||id)}<br>الحالة: ${escapeHtml(labels[st]||st)}`; out.style.color=st.includes('rejected')?'#b42318':st==='principal_approved'?'#14784a':'#174b78'; if(st==='principal_approved'){ currentTrackedData=d; out.innerHTML+=`<br><button class="btn btn-primary" style="margin-top:10px" onclick="downloadOfficialLeaveWord(this)">📝 تحميل نموذج الإجازة الرسمي (Word)</button>`; } } catch(e){out.textContent=e.message||'تعذر جلب حالة الطلب.';out.style.color='#b42318';}
+    try{ const r=await fetch(API_URL,{method:'POST',body:fd,headers:{'Content-Type':'application/x-www-form-urlencoded'}}); const x=await r.json(); if(!x.success)throw new Error(x.message||'لم يتم العثور على الطلب.'); const d=x.data||{}; if(String(d.permissionType||'')!=='طلب إجازة')throw new Error('رقم الطلب لا يعود إلى طلب إجازة.'); const labels={under_process:'تحت الإجراء — بانتظار القرار النهائي للمدير',pending:'تحت الإجراء — بانتظار القرار النهائي للمدير',coordinator_approved:'تمت موافقة المنسق — بانتظار النائب',vp_pending:'بانتظار موافقة النائب المختص',vp_approved:'تمت موافقة النائب — بانتظار المدير',principal_approved:'معتمد نهائيًا — يمكنك تحميل نموذج الإجازة',principal_rejected:'مرفوض من المدير',vp_rejected:'مرفوض من النائب',coordinator_rejected:'مرفوض من المنسق'}; const st=String(d.status||'pending'); out.innerHTML=`رقم الطلب: ${escapeHtml(d.requestId||id)}<br>الحالة: ${escapeHtml(labels[st]||st)}`; out.style.color=st.includes('rejected')?'#b42318':st==='principal_approved'?'#14784a':'#174b78'; if(st==='principal_approved'){ currentTrackedData=d; out.innerHTML+=`<br><button class="btn btn-primary" style="margin-top:10px" onclick="downloadOfficialLeaveWord(this)">📝 تحميل نموذج الإجازة الرسمي (Word)</button>`; } } catch(e){out.textContent=e.message||'تعذر جلب حالة الطلب.';out.style.color='#b42318';}
   }
 
   async function trackLeaveRequestFromLeaveScreen() {
     const input=document.getElementById('leaveTrackReqId'); const reqId=String(input?.value||'').trim(); const out=document.getElementById('leaveTrackStatus'); const subBox = document.getElementById('leaveTrackSubstitutesBox'); if (subBox) subBox.classList.add('hidden'); if(!reqId) { if(out) out.textContent='أدخل رقم طلب الإجازة أولًا.'; return; } if(out) out.textContent='جارٍ تحميل حالة الطلب...'; const fd=new URLSearchParams(); fd.append('action','getRequest'); fd.append('reqId',reqId);
     try {
-      const res=await fetch(API_URL,{method:'POST',body:fd,headers:{'Content-Type':'application/x-www-form-urlencoded'}}); const result=await res.json(); if(!result.success) throw new Error(result.message||'لم يتم العثور على الطلب.'); const d=result.data||{}; if(String(d.permissionType||'')!=='طلب إجازة') throw new Error('رقم الطلب لا يعود إلى طلب إجازة.'); const labels={pending:'بانتظار موافقة المنسق',coordinator_approved:'تمت موافقة المنسق — بانتظار النائب',vp_pending:'بانتظار موافقة النائب المختص',vp_approved:'تمت موافقة النائب — بانتظار المدير',principal_approved:'معتمد نهائيًا — يمكنك تنزيل النموذج',principal_rejected:'مرفوض من المدير',vp_rejected:'مرفوض من النائب',coordinator_rejected:'مرفوض من المنسق'}; const status=String(d.status||'pending');
+      const res=await fetch(API_URL,{method:'POST',body:fd,headers:{'Content-Type':'application/x-www-form-urlencoded'}}); const result=await res.json(); if(!result.success) throw new Error(result.message||'لم يتم العثور على الطلب.'); const d=result.data||{}; if(String(d.permissionType||'')!=='طلب إجازة') throw new Error('رقم الطلب لا يعود إلى طلب إجازة.'); const labels={under_process:'تحت الإجراء — بانتظار القرار النهائي للمدير',pending:'تحت الإجراء — بانتظار القرار النهائي للمدير',coordinator_approved:'تمت موافقة المنسق — بانتظار النائب',vp_pending:'بانتظار موافقة النائب المختص',vp_approved:'تمت موافقة النائب — بانتظار المدير',principal_approved:'معتمد نهائيًا — يمكنك تنزيل النموذج',principal_rejected:'مرفوض من المدير',vp_rejected:'مرفوض من النائب',coordinator_rejected:'مرفوض من المنسق'}; const status=String(d.status||'pending');
       if(out) { out.textContent=`رقم الطلب: ${d.requestId||reqId} — الحالة: ${labels[status]||status}`; out.style.color=status.includes('rejected')?'#b42318':status==='principal_approved'?'#14784a':'#174b78'; }
       const isOwner = currentLeaveEmp && String(currentLeaveEmp.employeeId || '') === String(d.employeeId || d.empId || ''); currentTrackReqId = reqId; currentTrackRequesterEmpId = String(currentLeaveEmp?.employeeId || '');
       if (isOwner && String(d.permissionType || '') === 'طلب إجازة') { try { const ld = parseLeaveData(d); if (ld.requestKind === 'leave' && Array.isArray(ld.leaveCoverage) && ld.leaveCoverage.length > 0) { leaveWhatsAppRequest = d; leaveWhatsAppRows = ld.leaveCoverage; currentLeaveRequesterId = String(currentLeaveEmp.employeeId); if (out) { out.innerHTML += `<div style="margin-top:12px;padding:12px;background:#e0f2fe;border:1px solid #7dd3fc;border-radius:10px;text-align:right;"><div style="font-weight:900;color:#0c5460;margin-bottom:8px;">📲 إرسال تفاصيل التغطية للبدلاء عبر واتساب:</div>${renderCoverageTableHtml(ld.leaveCoverage, 'لا يوجد بدلاء.', true)}</div>`; } } } catch(_) {} }
@@ -1000,7 +1036,7 @@
   function sendSubstituteCredentialsWhatsApp(index, source, coverageKind) {
     coverageKind = coverageKind || 'حصص'; const creds = window.__lastSubstituteCredentials || []; const c = creds[index]; if (!c) return alert('لا توجد بيانات.'); const reqId = source === 'leave' ? (window.__lastSubstituteReqId || currentLeaveRequestId || '') : (savedReqId || ''); const emp = (ALL_EMPLOYEES || []).find(e => String(e.employeeId || '') === String(c.employeeId || '')); const phone = String(emp && emp.phone ? emp.phone : '').replace(/\D/g, ''); const finalPhone = phone.length === 8 ? '974' + phone : phone; const kind = source === 'leave' ? 'طلب إجازة' : 'طلب استئذان';
     const taskLine = coverageKind === 'إداري' ? 'تم اختيارك لتغطية الأعمال الإدارية' : 'تم اختيارك لتغطية حصة/حصص';
-    const msg = `السلام عليكم أ. ${c.name || ''}\n\n${taskLine} ضمن ${kind}.\n\nرقم الطلب: ${reqId}\nرقمك الوظيفي: ${c.employeeId || ''}\nكلمة المرور المؤقتة: ${c.tempPassword || ''}\n\nيرجى الدخول إلى نظام الاستئذان، والضغط على زر «المعلم/الإداري البديل»، ثم إدخال رقم الطلب والرقم الوظيفي وكلمة المرور المؤقتة أعلاه، ثم الموافقة أو الرفض.\n\nملاحظة: كلمة المرور تُستخدم مرة واحدة فقط.\nشاكرين تعاونكم.`;
+    const msg = `السلام عليكم أ. ${c.name || ''}\n\n${taskLine} ضمن ${kind}.\n\nرقم الطلب: ${reqId}\nرقمك الوظيفي: ${c.employeeId || ''}\nكلمة المرور المؤقتة: ${c.tempPassword || ''}\n\nيرجى الدخول إلى نظام الاستئذان، والضغط على زر «المعلم البديل»، ثم إدخال رقم الطلب والرقم الوظيفي وكلمة المرور المؤقتة أعلاه، ثم الموافقة أو الرفض.\n\nملاحظة: كلمة المرور تُستخدم مرة واحدة فقط.\nشاكرين تعاونكم.`;
     const url = finalPhone ? (/Android|iPhone/i.test(navigator.userAgent) ? `whatsapp://send?phone=${finalPhone}&text=${encodeURIComponent(msg)}` : `https://web.whatsapp.com/send?phone=${finalPhone}&text=${encodeURIComponent(msg)}`) : `https://wa.me/?text=${encodeURIComponent(msg)}`; window.open(url, '_blank');
   }
 
@@ -1050,7 +1086,7 @@
   function sendRequesterCredentialWhatsApp(substituteEmpId, substituteName, tempPassword, reqId, coverageKind) {
     coverageKind = coverageKind || ''; const emp = (ALL_EMPLOYEES || []).find(e => String(e.employeeId || '') === String(substituteEmpId || '')); const phone = String(emp && emp.phone ? emp.phone : '').replace(/\D/g, ''); const finalPhone = phone.length === 8 ? '974' + phone : phone; const rid = reqId || currentTrackReqId || currentLeaveRequestId || savedReqId || '';
     const taskLine = coverageKind === 'إداري' ? 'تم إعادة توليد كلمة مرور مؤقتة جديدة لك لتغطية الأعمال الإدارية.' : 'تم إعادة توليد كلمة مرور مؤقتة جديدة لك من مقدم الطلب.';
-    const msg = `السلام عليكم أ. ${substituteName || ''}\n\n${taskLine}\n\nرقم الطلب: ${rid}\nرقمك الوظيفي: ${substituteEmpId || ''}\nكلمة المرور المؤقتة الجديدة: ${tempPassword || ''}\n\nيمكنك الآن الدخول إلى النظام واختيار «المعلم/الإداري البديل»، ثم إدخال رقم الطلب والرقم الوظيفي وكلمة المرور أعلاه، ثم الموافقة على التغطية.\n\nملاحظة: كلمة المرور تُستخدم مرة واحدة فقط.\nشاكرين تعاونكم.`;
+    const msg = `السلام عليكم أ. ${substituteName || ''}\n\n${taskLine}\n\nرقم الطلب: ${rid}\nرقمك الوظيفي: ${substituteEmpId || ''}\nكلمة المرور المؤقتة الجديدة: ${tempPassword || ''}\n\nيمكنك الآن الدخول إلى النظام واختيار «المعلم البديل»، ثم إدخال رقم الطلب والرقم الوظيفي وكلمة المرور أعلاه، ثم الموافقة على التغطية.\n\nملاحظة: كلمة المرور تُستخدم مرة واحدة فقط.\nشاكرين تعاونكم.`;
     const url = finalPhone ? (/Android|iPhone/i.test(navigator.userAgent) ? `whatsapp://send?phone=${finalPhone}&text=${encodeURIComponent(msg)}` : `https://web.whatsapp.com/send?phone=${finalPhone}&text=${encodeURIComponent(msg)}`) : `https://wa.me/?text=${encodeURIComponent(msg)}`; window.open(url, '_blank');
   }
 
@@ -1133,24 +1169,24 @@
   function updateCoverageMode() {
     const adminMode = isAdministrativeCadreSelected(); const noCoverage = Boolean(document.getElementById('noCoverageNeeded')?.checked); const noCoverageLabel = document.getElementById('noCoverageLabel');
     if (noCoverageLabel) noCoverageLabel.textContent = adminMode ? 'أؤكد أنه لا توجد لدي أعمال إدارية تتطلب التغطية أثناء فترة الاستئذان، ولا أحتاج إلى موظف إداري بديل.' : 'أؤكد أنه لا توجد لدي حصص أثناء فترة الاستئذان، ولا أحتاج إلى معلم لتغطية الحصص.';
-    document.getElementById('classCoverageGroup')?.classList.toggle('hidden', adminMode || noCoverage); document.getElementById('adminCoverageGroup')?.classList.toggle('hidden', !adminMode || noCoverage); document.getElementById('teacherConsentRow')?.classList.toggle('hidden', adminMode || noCoverage); document.getElementById('adminConsentRow')?.classList.toggle('hidden', !adminMode || noCoverage);
+    document.getElementById('classCoverageGroup')?.classList.toggle('hidden', adminMode || noCoverage); document.getElementById('teacherConsentRow')?.classList.toggle('hidden', adminMode || noCoverage); document.getElementById('adminConsentRow')?.classList.toggle('hidden', !adminMode); document.getElementById('noCoverageRow')?.classList.toggle('hidden', adminMode); if (adminMode) { const noCov=document.getElementById('noCoverageNeeded'); if(noCov) noCov.checked=true; }
     const title = document.getElementById('pdf-coverage-title'); if (title) title.textContent = adminMode ? 'تغطية العمل الإداري:' : 'جدول تغطية الحصص:';
     const routingNote = document.getElementById('routingNote'); if (routingNote) routingNote.textContent = adminMode ? 'سيُرسل إشعار واتساب مباشرة إلى النائب الإداري، دون المرور بالمنسق أو النائب الأكاديمي.' : 'سيُرسل الإشعار إلى المسؤول المباشر وفق المادة والكادر ومسار الاعتماد.';
     const waBtn = document.getElementById('waBtn'); if (waBtn) waBtn.textContent = adminMode ? '📱 إرسال إشعار واتساب للنائب الإداري' : '📱 إرسال الطلب للمسؤول المباشر';
-    if (adminMode) populateAdminSubstitutes(); else { const wrap = document.getElementById('coverageEntries'); if (wrap && wrap.children.length === 0 && currentEmp) addCoverageEntry(); }
+    if (!adminMode) { const wrap = document.getElementById('coverageEntries'); if (wrap && wrap.children.length === 0 && currentEmp) addCoverageEntry(); }
   }
 
   function toggleAdminSubstituteMsgBtn() { const select = document.getElementById('adminSubstituteSelect'); const btn = document.getElementById('adminSubstituteMsgBtn'); if (btn && select) btn.classList.toggle('hidden', !select.value); }
 
   function sendAdminSubstituteMsg() {
     const select = document.getElementById('adminSubstituteSelect'); const option = select?.selectedOptions?.[0]; const phone = option?.dataset?.phone; if (!select?.value) return alert('اختر الموظف الإداري البديل أولاً.'); if (!phone) return alert('لا يوجد رقم هاتف للموظف الإداري البديل.'); const details = document.getElementById('adminCoverageDetails').value.trim(); const requestLine = savedReqId ? `رقم الطلب: ${savedReqId}\n` : 'يرجى الاحتفاظ برقم الطلب الذي سيظهر بعد حفظ الطلب.\n';
-    const msg = `السلام عليكم،\nالأستاذ/ة ${select.value} المحترم/ة،\nأرجو تغطية الأعمال الإدارية التالية بدلاً مني: ${details || 'سيتم توضيحها في الطلب'}.\n${requestLine}بعد حفظ الطلب، يرجى الدخول إلى نظام الاستئذان واختيار «المعلم/الإداري البديل»، ثم إدخال رقم الطلب والرقم الوظيفي وكلمة المرور المؤقتة لتسجيل الموافقة أو الرفض.\nمقدم الطلب: ${currentEmp?.name || ''}`;
+    const msg = `السلام عليكم،\nالأستاذ/ة ${select.value} المحترم/ة،\nأرجو تغطية الأعمال الإدارية التالية بدلاً مني: ${details || 'سيتم توضيحها في الطلب'}.\n${requestLine}بعد حفظ الطلب، يرجى الدخول إلى نظام الاستئذان واختيار «المعلم البديل»، ثم إدخال رقم الطلب والرقم الوظيفي وكلمة المرور المؤقتة لتسجيل الموافقة أو الرفض.\nمقدم الطلب: ${currentEmp?.name || ''}`;
     const url = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? `whatsapp://send?phone=${String(phone).replace(/\D/g,'')}&text=${encodeURIComponent(msg)}` : `https://web.whatsapp.com/send?phone=${String(phone).replace(/\D/g,'')}&text=${encodeURIComponent(msg)}`; window.open(url, '_blank');
   }
 
   function enterSubstituteApproval() {
     document.getElementById('employeePortal').classList.add('hidden'); document.getElementById('secretButtons').classList.add('hidden'); document.getElementById('approvalScreen').classList.remove('hidden'); document.getElementById('approvalTitle').innerText = 'دخول البديل / مقدم الطلب'; document.getElementById('searchBox').classList.add('hidden'); document.getElementById('requestDetails').classList.add('hidden'); document.getElementById('requesterSubstitutesBox').classList.add('hidden'); const box = document.getElementById('substituteLoginBox'); box.classList.remove('hidden');
-    box.innerHTML = `<h3>دخول المعلم/الإداري البديل</h3><p style="font-size:0.9rem;color:#555;">أدخل رقم الطلب والرقم الوظيفي وكلمة المرور المؤقتة التي استلمتها من مقدم الطلب.</p><div class="form-group"><label>رقم الطلب *</label><input type="text" id="subLoginReqId" placeholder="REQ-..." style="text-align:center;"></div><div class="form-group"><label>الرقم الوظيفي *</label><input type="text" id="subLoginEmpId" placeholder="أدخل رقمك الوظيفي" style="text-align:center;"></div><div class="form-group"><label>كلمة المرور المؤقتة (اتركها فارغة إن كنت مقدم الطلب) *</label><input type="text" id="subLoginPassword" placeholder="كلمة المرور المؤقتة" style="text-align:center;direction:ltr;"></div><button class="btn btn-primary" type="button" onclick="substituteLogin()">دخول</button><p style="font-size:0.8rem;color:#856404;margin-top:10px;">💡 إذا كنت <strong>مقدم الطلب</strong>، اكتب رقم الطلب ورقمك الوظيفي واترك كلمة المرور فارغة — ستظهر لك لوحة إدارة البدلاء.</p><p id="subLoginError" class="error-msg"></p>`;
+    box.innerHTML = `<h3>دخول المعلم البديل</h3><p style="font-size:0.9rem;color:#555;">أدخل رقم الطلب والرقم الوظيفي وكلمة المرور المؤقتة التي استلمتها من مقدم الطلب.</p><div class="form-group"><label>رقم الطلب *</label><input type="text" id="subLoginReqId" placeholder="REQ-..." style="text-align:center;"></div><div class="form-group"><label>الرقم الوظيفي *</label><input type="text" id="subLoginEmpId" placeholder="أدخل رقمك الوظيفي" style="text-align:center;"></div><div class="form-group"><label>كلمة المرور المؤقتة (اتركها فارغة إن كنت مقدم الطلب) *</label><input type="text" id="subLoginPassword" placeholder="كلمة المرور المؤقتة" style="text-align:center;direction:ltr;"></div><button class="btn btn-primary" type="button" onclick="substituteLogin()">دخول</button><p style="font-size:0.8rem;color:#856404;margin-top:10px;">💡 إذا كنت <strong>مقدم الطلب</strong>، اكتب رقم الطلب ورقمك الوظيفي واترك كلمة المرور فارغة — ستظهر لك لوحة إدارة البدلاء.</p><p id="subLoginError" class="error-msg"></p>`;
     currentRole = 'substitute'; currentSubstituteSession = ''; currentRequesterSession = '';
   }
 
@@ -1233,7 +1269,7 @@
 
   function sendSubstituteMsg(idx) {
     const entry = document.querySelector(`.coverage-entry[data-entry-id="${idx}"]`); const sel = entry.querySelector('.cov-teacher'); const phone = sel.selectedOptions[0]?.dataset?.phone; const name = sel.value; const employeeId = sel.selectedOptions[0]?.dataset?.empId || 'يرجى التأكد من الرقم الوظيفي'; if (!phone) return alert('لا يوجد رقم هاتف لهذا المعلم.'); const subject = entry.querySelector('.cov-subject').value; const day = entry.querySelector('.cov-day').value; const date = entry.querySelector('.cov-date').value; const period = entry.querySelector('.cov-period').value; const requestLine = savedReqId ? `رقم الطلب: ${savedReqId}\n` : 'سيظهر رقم الطلب بعد حفظ الطلب؛ يرجى طلبه من مقدم الطلب.\n'; const className = entry.querySelector('.cov-class')?.value || 'لم يحدد الصف';
-    const msg = `السلام عليكم أ. ${name}،\nنرجو التكرم بتغطية الحصة الموضحة أدناه بدلاً من مقدم الطلب.\nاسم المعلم البديل: ${name}\nالرقم الوظيفي للبديل: ${employeeId}\nالصف: ${className}\nالمادة: ${subject}\nاليوم: ${day}\nالتاريخ: ${date}\nالحصة: ${period}\n${requestLine}لتسجيل قرارك إلكترونياً، افتح نظام الاستئذان بنفسك، ثم اضغط على زر «المعلم/الإداري البديل»، وأدخل رقم الطلب والرقم الوظيفي وكلمة المرور المؤقتة التي ستصلك من مقدم الطلب، ثم اختر «موافقة» أو «رفض».\nمقدم الطلب: ${currentEmp.name}\nيرجى تسجيل القرار لكل طلب تغطية موجه إليك. وشكراً لتعاونك.`;
+    const msg = `السلام عليكم أ. ${name}،\nنرجو التكرم بتغطية الحصة الموضحة أدناه بدلاً من مقدم الطلب.\nاسم المعلم البديل: ${name}\nالرقم الوظيفي للبديل: ${employeeId}\nالصف: ${className}\nالمادة: ${subject}\nاليوم: ${day}\nالتاريخ: ${date}\nالحصة: ${period}\n${requestLine}لتسجيل قرارك إلكترونياً، افتح نظام الاستئذان بنفسك، ثم اضغط على زر «المعلم البديل»، وأدخل رقم الطلب والرقم الوظيفي وكلمة المرور المؤقتة التي ستصلك من مقدم الطلب، ثم اختر «موافقة» أو «رفض».\nمقدم الطلب: ${currentEmp.name}\nيرجى تسجيل القرار لكل طلب تغطية موجه إليك. وشكراً لتعاونك.`;
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent); const url = isMobile ? `whatsapp://send?phone=${phone}&text=${encodeURIComponent(msg)}` : `https://web.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`; window.open(url, '_blank'); sessionStorage.setItem('substituteMsgSent', 'true');
   }
 
@@ -1246,7 +1282,7 @@
 
   function populatePermissionTimeDropdowns() {
     const options = ['<option value="">-- اختر الوقت --</option>'];
-    for (let minutes = 7 * 60; minutes <= 14 * 60; minutes += 15) {
+    for (let minutes = 7 * 60; minutes <= 14 * 60; minutes += 1) {
       const h = Math.floor(minutes / 60), m = minutes % 60;
       const value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
       const hour12 = h % 12 || 12;
@@ -1270,11 +1306,11 @@
   }
 
   async function submitRequest() {
-    if (currentBalance <= 0) { alert('عذراً، لقد نفذ رصيدك الشهري. لا يمكنك إرسال طلب إلكتروني. يمكنك التقدم بطلب ورقي.'); return; } const btn = document.getElementById('submitBtn'); const successBox = document.getElementById('successBox'); const waBtn = document.getElementById('waBtn'); if (!currentEmp) return alert('يرجى تسجيل الدخول أولاً.'); const date = document.getElementById('permDate').value; const exitTime = document.getElementById('exitTime').value; const returnTime = document.getElementById('returnTime').value; const permissionType = document.getElementById('permType').value; const reason = document.getElementById('reason').value.trim(); if (!date) return alert('يرجى تحديد التاريخ.'); if (!exitTime || !returnTime) return alert('يرجى تحديد الأوقات.'); if (!reason) return alert('يرجى كتابة سبب الاستئذان.'); const subjectSelect = document.getElementById('subjectSelect'); if (!subjectSelect.disabled && !subjectSelect.value) return alert('يرجى اختيار المادة.'); const adminMode = isAdministrativeCadreSelected(); const noCoverage = Boolean(document.getElementById('noCoverageNeeded')?.checked);
+    if (currentBalance <= 0) { alert('عذراً، لقد نفذ رصيدك الشهري. لا يمكنك إرسال طلب إلكتروني. يمكنك التقدم بطلب ورقي.'); return; } const btn = document.getElementById('submitBtn'); const successBox = document.getElementById('successBox'); const waBtn = document.getElementById('waBtn'); if (!currentEmp) return alert('يرجى تسجيل الدخول أولاً.'); const date = document.getElementById('permDate').value; const exitTime = document.getElementById('exitTime').value; const returnTime = document.getElementById('returnTime').value; const permissionType = document.getElementById('permType').value; const reason = document.getElementById('reason').value.trim(); if (!date) return alert('يرجى تحديد التاريخ.'); if (!exitTime || !returnTime) return alert('يرجى تحديد الأوقات.'); if (!reason && !adminMode) return alert('يرجى كتابة سبب الاستئذان.'); if (adminMode && !document.getElementById('adminConsent').checked) return alert('يرجى تأكيد التعهد بعدم وجود أعمال إدارية أثناء وقت الاستئذان.'); const subjectSelect = document.getElementById('subjectSelect'); if (!subjectSelect.disabled && !subjectSelect.value) return alert('يرجى اختيار المادة.'); const adminMode = isAdministrativeCadreSelected(); const noCoverage = Boolean(document.getElementById('noCoverageNeeded')?.checked);
     let coverageArr = []; let adminCoverage = ''; let adminSubstitute = ''; let adminSubstituteEmpId = '';
     if (adminMode && !noCoverage) { adminCoverage = document.getElementById('adminCoverageDetails').value.trim(); const sel = document.getElementById('adminSubstituteSelect'); adminSubstitute = sel.value; adminSubstituteEmpId = sel.selectedOptions[0]?.dataset?.empId || ''; if (!adminCoverage) return alert('اكتب الأعمال الإدارية.'); if (!adminSubstitute) return alert('اختر الموظف الإداري البديل.'); if (!document.getElementById('adminConsent').checked) return alert('أكد التنسيق مع الموظف الإداري البديل.'); } else if (!adminMode && !noCoverage) { if (!document.getElementById('teacherConsent').checked) return alert('يجب الموافقة على التعهد.'); coverageArr = collectCoverageData(); if (!coverageArr.length) return alert('أضف حصة تغطية واحدة على الأقل.'); if (coverageArr.some(x => x._invalid)) return alert('يرجى اختيار الصف لكل حصة تغطية.'); }
     const duration = calcDuration(); const coverageText = coverageArr.map(c => `الصف: ${c.className} | المادة: ${c.subject} | اليوم: ${c.day} | التاريخ: ${c.date} | الحصة: ${c.period} | البديل: ${c.substituteTeacher} | الرقم: ${c.substituteEmpId}`).join('\n');
-    const data = { employeeId: currentEmp.employeeId, empId: currentEmp.employeeId, name: currentEmp.name || '', jobTitle: currentEmp.jobTitle || '', phone: currentEmp.phone || '', email: currentEmp.email || '', subject: subjectSelect.disabled ? 'إرسال مباشر للنائب الأكاديمي' : subjectSelect.value, coverageType: adminMode ? 'إداري' : 'حصص', adminCoverage: noCoverage && adminMode ? 'لا توجد أعمال إدارية تتطلب التغطية.' : adminCoverage, adminSubstitute, adminSubstituteEmpId, permissionType, date, exitTime, returnTime, reason, coverage: noCoverage ? 'لا توجد حصص تتطلب التغطية.' : (adminMode ? ('تغطية إدارية: ' + adminCoverage + ' | ' + adminSubstitute) : coverageText), coverageDetails: JSON.stringify(coverageArr), noCoverageNeeded: noCoverage, duration, consent: noCoverage ? true : (adminMode ? document.getElementById('adminConsent').checked : document.getElementById('teacherConsent').checked), substituteMsgSent: sessionStorage.getItem('substituteMsgSent') === 'true' };
+    const data = { employeeId: currentEmp.employeeId, empId: currentEmp.employeeId, name: currentEmp.name || '', jobTitle: currentEmp.jobTitle || '', phone: currentEmp.phone || '', email: currentEmp.email || '', subject: subjectSelect.disabled ? 'إرسال مباشر للنائب الأكاديمي' : subjectSelect.value, coverageType: adminMode ? 'إداري' : 'حصص', adminCoverage: adminMode ? 'لا توجد أعمال إدارية أثناء وقت الاستئذان.' : adminCoverage, adminSubstitute: '', adminSubstituteEmpId: '', permissionType, date, exitTime, returnTime, reason, coverage: adminMode ? 'تعهد: لا توجد أعمال إدارية أثناء وقت الاستئذان.' : (noCoverage ? 'لا توجد حصص تتطلب التغطية.' : coverageText), coverageDetails: JSON.stringify(coverageArr), noCoverageNeeded: noCoverage, duration, consent: adminMode ? document.getElementById('adminConsent').checked : (noCoverage ? true : document.getElementById('teacherConsent').checked), substituteMsgSent: sessionStorage.getItem('substituteMsgSent') === 'true' };
     const originalText = btn ? btn.innerText : 'إرسال الطلب'; if (btn) { btn.disabled = true; btn.innerText = 'جارٍ حفظ الطلب...'; } if (successBox) successBox.classList.add('hidden'); if (waBtn) waBtn.style.display = 'none';
     try {
       const fd = new URLSearchParams(); fd.set('action', 'submit'); fd.set('data', JSON.stringify(data)); fd.set('email', data.email); const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body: fd.toString() }); if (!response.ok) throw new Error('تعذر الاتصال بالخادم.'); const result = await response.json(); if (!result || result.success !== true || !(result.requestId || result.reqId)) throw new Error(result?.message || 'لم يؤكد الخادم الحفظ.'); savedReqId = String(result.requestId || result.reqId).trim(); document.getElementById('displayReqId').textContent = savedReqId; if (successBox) successBox.classList.remove('hidden'); if (waBtn) waBtn.style.display = 'block';
@@ -1323,17 +1359,52 @@
     if (reject) reject.disabled = false;
   }
 
+  let roleIconsRevealToken = '';
   function askPassword(role) {
-    openPasswordModal("أدخل كلمة المرور:", async (pass) => {
-      if (!pass) return;
+    const runLogin = async (pass) => {
       try {
-        const fd = new URLSearchParams(); fd.set('action', 'login'); fd.set('role', role); fd.set('password', pass); const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body: fd.toString() }); const out = await res.json(); if (!out || !out.success) { alert(out && out.message ? out.message : 'كلمة المرور خاطئة!'); return; }
-        currentSessionToken = String(out.sessionToken || ''); currentRole = String(out.role || role); try { sessionStorage.setItem('sp_session_token', currentSessionToken); } catch (_) {} resetApprovalScreenForLogin(); currentLeaveRequesterId = ''; currentLeaveEmp = null; leaveWhatsAppRequest = null; leaveWhatsAppRows = []; currentSubstituteSession = ''; currentRequesterSession = '';
+        const fd = new URLSearchParams(); fd.set('action', 'login'); fd.set('role', role); fd.set('password', pass || '');
+        if (role === 'principal' || role === 'admin') fd.set('revealToken', roleIconsRevealToken);
+        const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body: fd.toString() });
+        const out = await res.json();
+        if (!out || !out.success) { alert(out && out.message ? out.message : 'تعذر تسجيل الدخول.'); return; }
+        currentSessionToken = String(out.sessionToken || ''); currentRole = String(out.role || role);
+        try { sessionStorage.setItem('sp_session_token', currentSessionToken); } catch (_) {}
+        resetApprovalScreenForLogin(); currentLeaveRequesterId = ''; currentLeaveEmp = null; leaveWhatsAppRequest = null; leaveWhatsAppRows = []; currentSubstituteSession = ''; currentRequesterSession = '';
         document.getElementById('employeePortal').classList.add('hidden'); document.getElementById('secretButtons').classList.add('hidden'); document.getElementById('substituteLoginBox').classList.add('hidden'); document.getElementById('requesterSubstitutesBox').classList.add('hidden'); document.getElementById('searchBox').classList.remove('hidden');
-        if (currentRole === 'admin') { document.getElementById('adminDashboard').classList.remove('hidden'); loadStats(); renderEmployeesList(); } else { document.getElementById('approvalScreen').classList.remove('hidden'); document.getElementById('approvalTitle').innerText = currentRole === 'coordinator' ? 'اعتماد المنسق' : currentRole === 'vp_admin' ? 'اعتماد النائب الإداري' : currentRole === 'vp' ? 'اعتماد النائب الأكاديمي' : 'الاعتماد النهائي (المدير)'; }
-      } catch (e) { alert('تعذر الاتصال بالخادم للتحقق من كلمة المرور.'); }
-    });
+        if (currentRole === 'admin') { document.getElementById('adminDashboard').classList.remove('hidden'); loadStats(); renderEmployeesList(); }
+        else { document.getElementById('approvalScreen').classList.remove('hidden'); document.getElementById('approvalTitle').innerText = currentRole === 'coordinator' ? 'اعتماد المنسق' : currentRole === 'vp_admin' ? 'اعتماد النائب الإداري' : currentRole === 'vp' ? 'اعتماد النائب الأكاديمي' : 'الاعتماد النهائي (المدير)'; }
+      } catch (e) { alert('تعذر الاتصال بالخادم.'); }
+    };
+    if (['principal','admin','coordinator','vp','vp_admin'].includes(role)) return runLogin('');
+    openPasswordModal("أدخل كلمة المرور:", runLogin);
   }
+
+  async function revealRoleIcons() {
+    const pass = prompt('أدخل كلمة مرور AUTH_ADMIN لإظهار أيقونتي المدير والإدارة:');
+    if (!pass) return;
+    try {
+      const fd = new URLSearchParams(); fd.set('action', 'revealRoleIcons'); fd.set('adminPassword', pass);
+      const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body: fd.toString() });
+      const out = await res.json();
+      if (!out || !out.success) { alert(out && out.message ? out.message : 'كلمة المرور غير صحيحة.'); return; }
+      roleIconsRevealToken = String(out.revealToken || '');
+      document.getElementById('principalRoleButton')?.classList.remove('hidden');
+      document.getElementById('adminRoleButton')?.classList.remove('hidden');
+      alert('تم إظهار أيقونتي المدير والإدارة. الدخول إليهما مباشر دون كلمة مرور إضافية.');
+    } catch (_) { alert('تعذر الاتصال بالخادم.'); }
+  }
+
+  (function setupFiveLogoTaps() {
+    let taps = 0, timer = null;
+    const logos = document.querySelectorAll('.school-logo, .single-logo, #homeScreen img');
+    logos.forEach(el => el.addEventListener('click', () => {
+      taps++;
+      clearTimeout(timer);
+      timer = setTimeout(() => { taps = 0; }, 1800);
+      if (taps >= 5) { taps = 0; clearTimeout(timer); revealRoleIcons(); }
+    }));
+  })();
 
   function revealAllPasswords() {
     openPasswordModal("أدخل كلمة مرور الجوكر:", async (joker) => {
@@ -1483,9 +1554,38 @@
     const btn = document.getElementById('approveActionBtn'); if (!btn || currentRole !== 'substitute') return; const msg = document.getElementById('approveMsg')?.innerText || ''; const alreadyDecided = /سبق تسجيل/.test(msg); btn.disabled = alreadyDecided || !document.getElementById('substituteConfirmCheck')?.checked;
   }
 
+  function confirmAlternativeCoverageCheckbox() {
+    return new Promise(resolve => {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.innerHTML = `<div class="modal-box" style="max-width:460px;text-align:right">
+        <h3>تأكيد توفير بديل آخر</h3>
+        <p>يوجد بديل رفض تغطية الحصة. يمكنك اعتماد الطلب بعد توفير بديل آخر لنفس الحصة.</p>
+        <label style="display:flex;gap:10px;align-items:flex-start;direction:rtl;margin:14px 0">
+          <input type="checkbox" id="replacementCoverageCheck" style="width:22px;height:22px;flex:0 0 22px;margin:2px 0">
+          <span>تم توفير بديل آخر لنفس الحصة.</span>
+        </label>
+        <div style="display:flex;gap:10px"><button type="button" class="btn btn-primary" id="replacementCoverageContinue" disabled>متابعة الاعتماد</button><button type="button" class="btn btn-outline" id="replacementCoverageCancel">إلغاء</button></div>
+      </div>`;
+      document.body.appendChild(overlay);
+      const check = overlay.querySelector('#replacementCoverageCheck');
+      const continueBtn = overlay.querySelector('#replacementCoverageContinue');
+      check.addEventListener('change', () => { continueBtn.disabled = !check.checked; });
+      continueBtn.addEventListener('click', () => { overlay.remove(); resolve(true); });
+      overlay.querySelector('#replacementCoverageCancel').addEventListener('click', () => { overlay.remove(); resolve(false); });
+    });
+  }
+
   async function approveRequest(decision) {
     const reqId = document.getElementById('searchReqId').dataset.currentId; if (!reqId) return; let requestData = null;
-    if (decision === 'approved' && currentRole !== 'substitute') { try { const check = new URLSearchParams(); check.append('action', 'getRequest'); check.append('reqId', reqId); const checkRes = await fetch(API_URL, { method: 'POST', body: check, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }); const checkData = await checkRes.json(); if (checkData && checkData.success) requestData = checkData.data || null; } catch (e) { return alert('تعذر التحقق من بيانات الطلب. حاول مرة أخرى.'); } if (!requestData) return alert('تعذر العثور على بيانات الطلب.'); let requestDetails = {}; try { requestDetails = typeof requestData.coverageDetails === 'string' ? JSON.parse(requestData.coverageDetails || '{}') : (requestData.coverageDetails || {}); } catch (_) { requestDetails = {}; } const isCasualLeave = requestData.permissionType === 'طلب إجازة' && requestDetails.leaveType === 'عارضة'; if (isCasualLeave && currentRole !== 'principal' && (requestDetails.coverageRequired === true || String(requestDetails.coverageRequired).toLowerCase() === 'true')) { const leaveCoverage = requestDetails.leaveCoverage; let substituteApprovals = requestData.substituteApprovals || []; if (typeof substituteApprovals === 'string') { try { substituteApprovals = JSON.parse(substituteApprovals); } catch (_) { substituteApprovals = []; } } const allSubstitutesApproved = Array.isArray(leaveCoverage) && leaveCoverage.length > 0 && Array.isArray(substituteApprovals) && substituteApprovals.length > 0 && leaveCoverage.every(coverage => { const empId = String(coverage.substituteEmpId || coverage.employeeId || '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\s/g, ''); if (!empId) return false; const approval = substituteApprovals.find(a => String(a.employeeId || '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\s/g, '') === empId); return approval && approval.status === 'approved'; }); if (!allSubstitutesApproved) return alert('لا يمكن اعتماد الإجازة العارضة قبل موافقة جميع البدلاء.'); } }
+    if (decision === 'approved' && currentRole !== 'substitute') { try { const check = new URLSearchParams(); check.append('action', 'getRequest'); check.append('reqId', reqId); const checkRes = await fetch(API_URL, { method: 'POST', body: check, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }); const checkData = await checkRes.json(); if (checkData && checkData.success) requestData = checkData.data || null; } catch (e) { return alert('تعذر التحقق من بيانات الطلب. حاول مرة أخرى.'); } if (!requestData) return alert('تعذر العثور على بيانات الطلب.'); let requestDetails = {}; try { requestDetails = typeof requestData.coverageDetails === 'string' ? JSON.parse(requestData.coverageDetails || '{}') : (requestData.coverageDetails || {}); } catch (_) { requestDetails = {}; } const isCasualLeave = requestData.permissionType === 'طلب إجازة' && requestDetails.leaveType === 'عارضة'; /* Coordinator approval is independent of substitute decisions. */
+      if (currentRole === 'coordinator') {
+        let approvals = requestData.substituteApprovals || [];
+        if (typeof approvals === 'string') { try { approvals = JSON.parse(approvals); } catch (_) { approvals = []; } }
+        const anyRejected = Array.isArray(approvals) && approvals.some(a => String(a.status || '').toLowerCase() === 'rejected');
+        if (anyRejected && !(await confirmAlternativeCoverageCheckbox())) return;
+      }
+    }
     if (currentRole === 'substitute' && decision === 'approved' && !document.getElementById('substituteConfirmCheck')?.checked) return alert('يرجى وضع علامة التأكيد بجوار اسمك قبل الموافقة.'); let rejectionReason = ''; if (decision === 'rejected') { rejectionReason = prompt(currentRole === 'substitute' ? 'يرجى كتابة سبب رفض التغطية:' : 'يرجى كتابة سبب رفض الطلب:'); if (rejectionReason === null) return; if (!rejectionReason.trim()) return alert('يجب كتابة سبب الرفض.'); }
     const fd = new URLSearchParams(); if (currentRole === 'substitute') { fd.append('action', 'updateSubstituteApproval'); fd.append('reqId', reqId); fd.append('employeeId', currentSubstituteEmpId); fd.append('decision', decision); if (currentSubstituteSession) fd.append('substituteSession', currentSubstituteSession); } else { fd.append('action', 'updateStatus'); fd.append('reqId', reqId); fd.append('role', currentRole); fd.append('decision', decision); if (currentSessionToken) fd.append('sessionToken', currentSessionToken); } if (rejectionReason) fd.append('reason', rejectionReason);
     document.getElementById('approveMsg').innerText = "جاري الحفظ..."; const res = await fetch(API_URL, { method: 'POST', body: fd, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }); const result = await res.json();
@@ -2028,7 +2128,160 @@
     const count=d.days||inclusiveDays(d.startDate,d.endDate); const isCasual=d.leaveType==='عارضة';
     const sum=currentLeaveSummary||{};
     const balanceText=`${sum.casualRemaining??'—'} يومًا متبقية من أصل 10 أيام`;
-    return String.raw`<html lang="ar" dir="rtl"><head><meta charset="utf-8"><style>body{font-family:Arial,'Tahoma',sans-serif;direction:rtl;color:#111;font-size:13px;margin:18px} .head{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #222;padding-bottom:9px;gap:10px} .school{text-align:center;font-weight:bold;line-height:1.7}.title{text-align:center;background:#eee;border:2px solid #333;padding:8px;font-size:18px;font-weight:bold;margin:12px 0} .line{margin:8px 0;line-height:1.8}.box{border:1px solid #777;padding:10px;min-height:52px}.tbl{width:100%;border-collapse:collapse;margin:10px 0}.tbl td,.tbl th{border:1px solid #555;padding:7px;text-align:center}.tbl th{background:#e9edf2}.section{font-weight:bold;margin-top:14px}.entered{color:#1457a6;font-weight:700}.sign{height:50px;max-width:180px;object-fit:contain;display:block;margin:4px auto 0}.official-note{color:#1457a6;font-weight:bold}</style></head><body><div class="head"><div style="font-weight:bold;line-height:1.7">وزارة التربية والتعليم والتعليم العالي<br>مدرسة أحمد بن راشد المريخي الابتدائية للبنين<br><small>الرؤية: متعلم ريادي لتنمية مستدامة</small></div><div style="direction:ltr;text-align:left;font-size:11px">Ministry of Education & Higher Education<br>Ahmed Bin Rashid Al-Muraikhi Primary School for Boys</div></div><div class="title">الموضوع: طلب إجازة — الرقم الوظيفي: ${escapeHtml(data.employeeId||'')}</div><div class="line">السيد/ مدير المدرسة المحترم،<br>السلام عليكم ورحمة الله وبركاته، وبعد،</div><div class="line">أرجو التكرم باحتساب غيابي من يوم <b class="entered">${escapeHtml(d.startDay||dateDayArabic(d.startDate))}</b> الموافق <b class="entered">${escapeHtml(fmtDate(d.startDate)||'')}</b> إلى يوم <b class="entered">${escapeHtml(d.endDay||dateDayArabic(d.endDate))}</b> الموافق <b class="entered">${escapeHtml(fmtDate(d.endDate)||'')}</b> إجازة <b class="entered">${escapeHtml(d.leaveType||'')}</b> وذلك بسبب: <span class="entered">${escapeHtml(d.reason||'')}</span></div><div class="line"><b>مقدم الطلب:</b> <span class="entered">${escapeHtml(data.name||d.employeeName||'')}</span> — <b>الوظيفة:</b> <span class="entered">${escapeHtml(data.jobTitle||d.jobTitle||'')}</span></div><div class="line"><b>التاريخ:</b> <span class="entered">${escapeHtml(fmtDate(today))}</span> — <b>التوقيع:</b> <span class="entered">تم التوقيع إلكترونيًا</span></div><div class="section">منسق المادة / الصفة</div><div class="line">الاسم: ${escapeHtml(d.coordinatorName||'منسق المادة')}&nbsp;&nbsp; التوقيع: تم التوقيع إلكترونيًا &nbsp;&nbsp; التاريخ: ${escapeHtml(data.coordinatorDate?fmtDate(data.coordinatorDate):(d.coordinatorDate||'—'))}</div><table class="tbl"><thead><tr><th>رصيد الموظف من الإجازات العارضة</th><th>عدد أيام الإجازات المستهلكة</th><th>ملاحظات</th></tr></thead><tbody><tr><td>${escapeHtml(balanceText)}</td><td>${escapeHtml(isCasual?'يشمل هذا الطلب المعتمد':'نوع الإجازة: '+(d.leaveType||'')+' — لا تخصم من رصيد العارضة')}</td></tr></tbody></table><div class="section">تعليق النائب الإداري / الأكاديمي:</div><div class="box">لا مانع من منحه الإجازة المطلوبة. <br>تم التوقيع إلكترونيًا</div><div class="section">قرار المدير العام:</div><div class="box">نوافق على منحه الإجازة المطلوبة.<br><div style="text-align:center;margin-top:8px"><b>توقيع المدير</b><br><img class="sign" src="https://raw.githubusercontent.com/elbasha1977/Staff-Permissions/main/signature.png" alt="توقيع المدير"><span class="official-note">تم اعتماد الطلب إلكترونيًا</span></div></div><p style="margin-top:26px;border-top:1px solid #aaa;padding-top:10px;text-align:center;font-size:11px">وثيقة إلكترونية صادرة من نظام الاستئذان والإجازات — ${escapeHtml(today)}</p></body></html>`;
+    return String.raw`<html lang="ar" dir="rtl"><head><meta charset="utf-8"><style>body{font-family:Arial,'Tahoma',sans-serif;direction:rtl;color:#111;font-size:13px;margin:18px} .head{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #222;padding-bottom:9px;gap:10px} .school{text-align:center;font-weight:bold;line-height:1.7}.title{text-align:center;background:#eee;border:2px solid #333;padding:8px;font-size:18px;font-weight:bold;margin:12px 0} .line{margin:8px 0;line-height:1.8}.box{border:1px solid #777;padding:10px;min-height:52px}.tbl{width:100%;border-collapse:collapse;margin:10px 0}.tbl td,.tbl th{border:1px solid #555;padding:7px;text-align:center}.tbl th{background:#e9edf2}.section{font-weight:bold;margin-top:14px}.entered{color:#1457a6;font-weight:700}.sign{height:50px;max-width:180px;object-fit:contain;display:block;margin:4px auto 0}.official-note{color:#1457a6;font-weight:bold}
+
+/* === Mobile-only layout repair: substitute nomination and approval screens === */
+@media screen and (max-width: 600px) {
+  html, body { max-width: 100%; overflow-x: hidden; }
+  body { padding: 8px !important; }
+  .animated-wrapper { width: 100% !important; max-width: 100% !important; min-width: 0 !important; }
+  .card { min-width: 0 !important; max-width: 100% !important; padding: 16px 12px !important; }
+
+  /* Substitute approval consent and checkbox rows */
+  .checkbox-row,
+  #substituteConsentBox,
+  #substituteConsentBox label,
+  #substituteConsentBox label[style],
+  #leaveAdminConsentRow,
+  #adminConsentRow {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .checkbox-row,
+  #substituteConsentBox label {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+    padding: 12px !important;
+  }
+  .checkbox-row input[type="checkbox"],
+  #substituteConsentBox input[type="checkbox"] {
+    flex: 0 0 22px !important;
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    margin: 3px 0 0 !important;
+  }
+  .checkbox-row label,
+  #substituteConsentBox label span {
+    flex: 1 1 180px !important;
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+    white-space: normal !important;
+    line-height: 1.7 !important;
+  }
+  #detCoverage, #detCoverageSection, #detSubstituteApprovals,
+  #substituteMsgNotice, #approveMsg, #detDetails,
+  #leaveTrackSubstitutesList, #trackSubstitutesList,
+  #requesterSubstitutesList {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+  #detCoverage { overflow-x: auto !important; }
+  #approvalScreen .row, #approvalScreen .row > *,
+  #approvalScreen .coverage-entry { min-width: 0 !important; max-width: 100% !important; }
+  #approvalScreen .btn, #approvalScreen button { max-width: 100% !important; white-space: normal !important; }
+
+  /* Candidate picker: compact, vertically flowing cards instead of oversized blank panels */
+  label:has(input[type="radio"][name="coverNominee"]),
+  label[style*="#dbe4ec"] {
+    display: flex !important;
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 12px !important;
+    gap: 9px !important;
+    box-sizing: border-box !important;
+    white-space: normal !important;
+  }
+  label:has(input[type="radio"][name="coverNominee"]) input[type="radio"] {
+    flex: 0 0 22px !important;
+    width: 22px !important;
+    height: 22px !important;
+    margin: 3px 0 0 !important;
+  }
+  label:has(input[type="radio"][name="coverNominee"]) span {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-wrap: anywhere !important;
+    white-space: normal !important;
+  }
+  .modal-overlay {
+    padding: 10px !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  .modal-box {
+    width: 100% !important;
+    max-width: 560px !important;
+    max-height: calc(100dvh - 20px) !important;
+    margin: auto 0 !important;
+    padding: 16px 12px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+  table.data-table { min-width: 560px; }
+}
+
+
+/* FINAL MOBILE FIX: substitute approval consent area */
+@media (max-width: 600px) {
+  #substituteConsentBox {
+    display: block !important; width: 100% !important; height: auto !important;
+    min-height: 0 !important; max-height: none !important; padding: 10px !important;
+    margin: 10px 0 !important; box-sizing: border-box !important; overflow: visible !important;
+  }
+  #substituteConsentBox label,
+  #substituteConsentBox label[style] {
+    display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;
+    direction: rtl !important; align-items: flex-start !important; justify-content: flex-start !important;
+    gap: 10px !important; width: 100% !important; height: auto !important;
+    min-height: 0 !important; max-height: none !important; margin: 0 !important;
+    padding: 4px !important; box-sizing: border-box !important; text-align: right !important;
+    white-space: normal !important;
+  }
+  #substituteConsentBox label > input[type="checkbox"],
+  #substituteConsentBox input[type="checkbox"] {
+    display: block !important; flex: 0 0 24px !important; width: 24px !important;
+    min-width: 24px !important; max-width: 24px !important; height: 24px !important;
+    min-height: 24px !important; margin: 3px 0 0 !important; padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  #substituteConsentBox label > span {
+    display: block !important; flex: 1 1 0 !important; width: auto !important;
+    min-width: 0 !important; max-width: 100% !important; height: auto !important;
+    min-height: 0 !important; margin: 0 !important; padding: 0 !important;
+    overflow: visible !important; overflow-wrap: anywhere !important; word-break: normal !important;
+    white-space: normal !important; line-height: 1.65 !important; text-align: right !important;
+  }
+  #substituteConsentBox strong { display: inline !important; white-space: normal !important; }
+  #requestDetails #approveActionBtn, #requestDetails #rejectActionBtn {
+    flex: 1 1 130px !important; min-width: 0 !important; width: auto !important;
+    max-width: 100% !important; white-space: normal !important;
+  }
+  #requestDetails > div[style*="display:flex"] {
+    display: flex !important; flex-direction: row !important; flex-wrap: wrap !important;
+    gap: 10px !important; width: 100% !important; min-width: 0 !important;
+  }
+  #requestDetails, #requestDetails * { min-width: 0; box-sizing: border-box; }
+}
+
+</style></head><body><div class="head"><div style="font-weight:bold;line-height:1.7">وزارة التربية والتعليم والتعليم العالي<br>مدرسة أحمد بن راشد المريخي الابتدائية للبنين<br><small>الرؤية: متعلم ريادي لتنمية مستدامة</small></div><div style="direction:ltr;text-align:left;font-size:11px">Ministry of Education & Higher Education<br>Ahmed Bin Rashid Al-Muraikhi Primary School for Boys</div></div><div class="title">الموضوع: طلب إجازة — الرقم الوظيفي: ${escapeHtml(data.employeeId||'')}</div><div class="line">السيد/ مدير المدرسة المحترم،<br>السلام عليكم ورحمة الله وبركاته، وبعد،</div><div class="line">أرجو التكرم باحتساب غيابي من يوم <b class="entered">${escapeHtml(d.startDay||dateDayArabic(d.startDate))}</b> الموافق <b class="entered">${escapeHtml(fmtDate(d.startDate)||'')}</b> إلى يوم <b class="entered">${escapeHtml(d.endDay||dateDayArabic(d.endDate))}</b> الموافق <b class="entered">${escapeHtml(fmtDate(d.endDate)||'')}</b> إجازة <b class="entered">${escapeHtml(d.leaveType||'')}</b> وذلك بسبب: <span class="entered">${escapeHtml(d.reason||'')}</span></div><div class="line"><b>مقدم الطلب:</b> <span class="entered">${escapeHtml(data.name||d.employeeName||'')}</span> — <b>الوظيفة:</b> <span class="entered">${escapeHtml(data.jobTitle||d.jobTitle||'')}</span></div><div class="line"><b>التاريخ:</b> <span class="entered">${escapeHtml(fmtDate(today))}</span> — <b>التوقيع:</b> <span class="entered">تم التوقيع إلكترونيًا</span></div><div class="section">منسق المادة / الصفة</div><div class="line">الاسم: ${escapeHtml(d.coordinatorName||'منسق المادة')}&nbsp;&nbsp; التوقيع: تم التوقيع إلكترونيًا &nbsp;&nbsp; التاريخ: ${escapeHtml(data.coordinatorDate?fmtDate(data.coordinatorDate):(d.coordinatorDate||'—'))}</div><table class="tbl"><thead><tr><th>رصيد الموظف من الإجازات العارضة</th><th>عدد أيام الإجازات المستهلكة</th><th>ملاحظات</th></tr></thead><tbody><tr><td>${escapeHtml(balanceText)}</td><td>${escapeHtml(isCasual?'يشمل هذا الطلب المعتمد':'نوع الإجازة: '+(d.leaveType||'')+' — لا تخصم من رصيد العارضة')}</td></tr></tbody></table><div class="section">تعليق النائب الإداري / الأكاديمي:</div><div class="box">لا مانع من منحه الإجازة المطلوبة. <br>تم التوقيع إلكترونيًا</div><div class="section">قرار المدير العام:</div><div class="box">نوافق على منحه الإجازة المطلوبة.<br><div style="text-align:center;margin-top:8px"><b>توقيع المدير</b><br><img class="sign" src="https://raw.githubusercontent.com/elbasha1977/Staff-Permissions/main/signature.png" alt="توقيع المدير"><span class="official-note">تم اعتماد الطلب إلكترونيًا</span></div></div><p style="margin-top:26px;border-top:1px solid #aaa;padding-top:10px;text-align:center;font-size:11px">وثيقة إلكترونية صادرة من نظام الاستئذان والإجازات — ${escapeHtml(today)}</p></body></html>`;
   }
 
   async function ensureLeaveSummaryForDocument() {
@@ -2278,6 +2531,13 @@
       adminGroup.classList.add('hidden');
     }
   }
+
+
+  function isWeekendDate(value) { if(!value) return false; const d=new Date(value+'T12:00:00'); return d.getDay()===5 || d.getDay()===6; }
+  function enforceWeekdayDate(inputId, label) { const el=document.getElementById(inputId); if(!el) return; el.addEventListener('change',()=>{ if(isWeekendDate(el.value)){ alert('يرجى اختيار يوم من الأحد إلى الخميس؛ الجمعة والسبت مستبعدان.'); el.value=''; if(inputId==='leaveStart'||inputId==='leaveEnd') updateLeaveDateSummary(); } }); }
+  ['permDate','leaveStart','leaveEnd'].forEach(id=>enforceWeekdayDate(id,id));
+  function updateLeaveReasonVisibility(){ const type=document.getElementById('leaveType')?.value; const group=document.getElementById('leaveReason')?.closest('.form-group'); const visible=type==='عارضة'; if(group) group.classList.toggle('hidden',!visible); const reason=document.getElementById('leaveReason'); if(reason){reason.required=visible; if(!visible) reason.value='';} }
+  document.getElementById('leaveType')?.addEventListener('change',updateLeaveReasonVisibility); updateLeaveReasonVisibility();
 
   document.getElementById('leaveType')?.addEventListener('change', updateLeaveCoverageVisibility);
   document.getElementById('leaveSubject')?.addEventListener('change', updateLeaveCoverageVisibility);
