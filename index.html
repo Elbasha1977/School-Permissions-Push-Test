@@ -6,7 +6,7 @@
   <meta http-equiv="Expires" content="0">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام الاستئذان والإجازات - نسخة المدير</title>
+  <title>نظام الاستئذان - مدرسة أحمد بن راشد المريخي</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -216,11 +216,12 @@
   #requestDetails #approveActionBtn, #requestDetails #rejectActionBtn { flex:1 1 130px !important; width:auto !important; min-width:0 !important; max-width:100% !important; box-sizing:border-box !important; white-space:normal !important; }
 }
 .requester-private-blur{filter:blur(4px);user-select:none;pointer-events:none}\n</style>
-  <link rel="manifest" href="./manifest-master.json">
-<meta name="theme-color" content="#006B35">
+  <meta name="theme-color" content="#12345b">
+  <link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#123456">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="الإجازات والأذونات">
-<link rel="apple-touch-icon" href="./master-icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
 </head>
 <body>
   <div class="flower-decor" aria-hidden="true"><span>🌸</span><span>🌼</span><span>🌷</span><span>✿</span><span>🌺</span><span>❀</span><span>🌻</span></div>
@@ -542,8 +543,10 @@
   </div>
 
   <div class="secret-buttons" id="secretButtons">
-    <button class="secret-btn hidden" id="principalRoleButton" onclick="askPassword('principal')">المدير</button>
-    <button class="secret-btn hidden" id="adminRoleButton" onclick="askPassword('admin')" style="font-size: 0.8rem;">⚙️ إدارة</button>
+    <button class="secret-btn" onclick="enterSubstituteApproval()">المعلم البديل</button>
+    <button class="secret-btn" onclick="askPassword('coordinator')">المنسق</button>
+    <button class="secret-btn" onclick="askPassword('vp')">النائب الأكاديمي</button>
+    <button class="secret-btn" onclick="askPassword('vp_admin')">النائب الإداري</button>
   </div>
 
   <div id="approvalScreen" class="animated-wrapper hidden">
@@ -1403,20 +1406,7 @@
     openPasswordModal("أدخل كلمة المرور:", runLogin);
   }
 
-  async function revealRoleIcons() {
-    const pass = prompt('أدخل كلمة مرور AUTH_ADMIN لإظهار أيقونتي المدير والإدارة:');
-    if (!pass) return;
-    try {
-      const fd = new URLSearchParams(); fd.set('action', 'revealRoleIcons'); fd.set('adminPassword', pass);
-      const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body: fd.toString() });
-      const out = await res.json();
-      if (!out || !out.success) { alert(out && out.message ? out.message : 'كلمة المرور غير صحيحة.'); return; }
-      roleIconsRevealToken = String(out.revealToken || '');
-      document.getElementById('principalRoleButton')?.classList.remove('hidden');
-      document.getElementById('adminRoleButton')?.classList.remove('hidden');
-      alert('تم إظهار أيقونتي المدير والإدارة. الدخول إليهما مباشر دون كلمة مرور إضافية.');
-    } catch (_) { alert('تعذر الاتصال بالخادم.'); }
-  }
+  async function revealRoleIcons() { alert('هذه نسخة الموظفين ولا تتضمن صلاحيات المدير أو الإدارة.'); }
 
   (function setupFiveLogoTaps() {
     let taps = 0, timer = null;
@@ -1425,7 +1415,7 @@
       taps++;
       clearTimeout(timer);
       timer = setTimeout(() => { taps = 0; }, 1800);
-      if (taps >= 5) { taps = 0; clearTimeout(timer); revealRoleIcons(); }
+      if (taps >= 5) { taps = 0; clearTimeout(timer); /* Client: no manager role reveal */ }
     }));
   })();
 
@@ -2770,7 +2760,7 @@
   <div id="pwaInstallOverlay" role="dialog" aria-modal="true" aria-labelledby="pwaInstallTitle"
        style="position:fixed;inset:0;z-index:200000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(10,24,43,.78);backdrop-filter:blur(5px)">
     <div style="width:min(440px,100%);background:#fff;border-radius:24px;padding:26px 22px;text-align:center;box-shadow:0 22px 70px #0005;color:#172033;direction:rtl">
-      <div aria-hidden="true" style="width:78px;height:78px;margin:0 auto 14px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#12345b,#18a6a0);color:white;font-size:38px"><img src="./master-icon-192.png" alt="أيقونة النظام" style="width:78px;height:78px;object-fit:contain;border-radius:20px" onerror="this.onerror=null;this.src='./master-icon-512.png';"></div>
+      <div aria-hidden="true" style="width:78px;height:78px;margin:0 auto 14px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#12345b,#18a6a0);color:white;font-size:38px"><img src="./icon-192.png" alt="أيقونة النظام" style="width:78px;height:78px;object-fit:contain;border-radius:20px" onerror="this.onerror=null;this.src='./icon-512.png';"></div>
       <h2 id="pwaInstallTitle" style="margin:0 0 10px;font-size:23px;color:#12345b">ثبّت نظام الاستئذان والإجازات</h2>
       <p style="line-height:1.8;margin:8px 0;color:#475569">ثبّت البرنامج على شاشة هاتفك للوصول إليه بسهولة من أيقونته.</p>
       <p id="pwaInstallHelp" style="font-size:13px;line-height:1.8;color:#64748b">إذا كان متصفحك يدعم التثبيت المباشر، يمكنك التثبيت الآن.</p>
