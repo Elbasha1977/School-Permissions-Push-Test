@@ -2863,10 +2863,8 @@
       window.setTimeout(showInstallDialog, 900);
     });
   })();
-  </script>
+  
 
-</body>
-</html
   async function notifyReplacementSubstituteWhatsApp() {
     if (currentRole !== 'coordinator') return alert('هذه الخاصية للمنسق فقط.');
     const reqId = document.getElementById('searchReqId').dataset.currentId;
@@ -2875,7 +2873,10 @@
     const opt = select?.selectedOptions?.[0];
     if (!reqId || !employeeId || !opt) return alert('اختر المعلم البديل الجديد أولاً.');
     const fd = new URLSearchParams(); fd.set('action','coordinatorReplaceSubstitute'); fd.set('reqId',reqId); fd.set('employeeId',employeeId); fd.set('sessionToken',currentSessionToken || '');
-    const btn = document.getElementById('replacementWhatsAppBtn'); btn.disabled = true; btn.textContent = 'جارٍ إنشاء كلمة المرور...';
+    const btn = document.getElementById('replacementWhatsAppBtn');
+    // Open synchronously on click so the browser does not block the WhatsApp tab after async fetch.
+    const waWindow = window.open('about:blank', '_blank');
+    btn.disabled = true; btn.textContent = 'جارٍ إنشاء كلمة المرور...';
     try {
       const res = await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:fd.toString()});
       const out = await res.json();
@@ -2885,9 +2886,11 @@
       const waPhone = phone.length === 8 ? '974' + phone : phone;
       const message = `السلام عليكم،\\nتم اختيارك كبديل جديد للطلب. يرجى الدخول إلى نظام الاستئذان والموافقة أو الرفض.\\nالرقم الوظيفي: ${out.employeeId}\\nرقم الطلب: ${out.requestId}\\nكلمة المرور المؤقتة: ${out.tempPassword}\\n\\nيرجى الدخول من زر المعلم البديل.`;
       document.getElementById('replacementPanelMsg').textContent = 'تم تسجيل البديل الجديد. سيتم فتح واتساب لإرسال بيانات الدخول.';
-      window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(message)}`,'_blank');
+      const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(message)}`;
+      if (waWindow && !waWindow.closed) waWindow.location.href = waUrl;
+      else window.location.href = waUrl;
       btn.textContent = '📲 إشعار البديل الجديد بالواتساب'; btn.disabled = false;
-    } catch(e) { alert('تعذر الاتصال بالخادم.'); btn.disabled = false; btn.textContent = '📲 إشعار البديل الجديد بالواتساب'; }
+    } catch(e) { if (waWindow && !waWindow.closed) waWindow.close(); alert('تعذر الاتصال بالخادم.'); btn.disabled = false; btn.textContent = '📲 إشعار البديل الجديد بالواتساب'; }
   }
 
   async function savePrincipalApprovalOverrides() {
@@ -2902,4 +2905,7 @@
     const msg=document.getElementById('principalOverrideMsg'); msg.textContent=out.success ? out.message : (out.message || 'تعذر حفظ التعديلات.'); msg.style.color=out.success?'#15803d':'#b91c1c';
   }
 
->
+  </script>
+
+</body>
+</html>
