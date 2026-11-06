@@ -6,7 +6,7 @@
   <meta http-equiv="Expires" content="0">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام الاستئذان والإجازات - نسخة المدير</title>
+  <title>نظام الاستئذان - مدرسة أحمد بن راشد المريخي</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -68,7 +68,7 @@
     .stat-box .value { font-size: 2rem; font-weight: bold; color: var(--primary); }
 
     .secret-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
-    .secret-btn { background: linear-gradient(135deg, #006B35, #00854a); color: #fff; padding: 10px 20px; border-radius: 12px; border: 1px solid #d4af37; cursor: pointer; font-family: 'Cairo'; font-weight: bold; transition: 0.3s; box-shadow: 0 3px 10px rgba(0,0,0,.12); }
+    .secret-btn { background: #e9ecef; color: #555; padding: 8px 15px; border-radius: 20px; border: none; cursor: pointer; font-family: 'Cairo'; font-weight: bold; transition: 0.3s; }
     .secret-btn:hover { background: var(--primary); color: white; }
 
     .status-track { display: flex; justify-content: space-between; margin: 20px 0; position: relative; }
@@ -215,20 +215,13 @@
   #requestDetails > div[style*="display:flex"] { display:flex !important; flex-wrap:wrap !important; gap:10px !important; }
   #requestDetails #approveActionBtn, #requestDetails #rejectActionBtn { flex:1 1 130px !important; width:auto !important; min-width:0 !important; max-width:100% !important; box-sizing:border-box !important; white-space:normal !important; }
 }
-.requester-private-blur{filter:blur(4px);user-select:none;pointer-events:none}\n
-    /* Direct manager entry: no employee registration or onboarding */
-    #homeScreen { display:none !important; }
-    #managerDirectHome { display:block !important; }
-    #secretButtons { display:flex !important; position:fixed; z-index:10000; left:0; right:0; top:50%; transform:translateY(-50%); margin:0 auto; width:min(850px,94vw); justify-content:center; gap:clamp(12px,3vw,28px); }
-    #secretButtons .secret-btn { flex:1 1 220px; min-height:clamp(90px,18vh,150px); font-size:clamp(24px,4vw,38px) !important; border:2px solid #d4af37; border-radius:22px; box-shadow:0 12px 28px #006b3530; }
-    @media(max-width:560px){ #secretButtons{flex-direction:column;width:min(420px,90vw);} #secretButtons .secret-btn{min-height:100px;} }
-
-</style>
-  <link rel="manifest" href="./manifest-master.json">
-<meta name="theme-color" content="#006B35">
+.requester-private-blur{filter:blur(4px);user-select:none;pointer-events:none}\n</style>
+  <meta name="theme-color" content="#12345b">
+  <link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#123456">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="الإجازات والأذونات">
-<link rel="apple-touch-icon" href="./master-icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
 </head>
 <body>
   <div class="flower-decor" aria-hidden="true"><span>🌸</span><span>🌼</span><span>🌷</span><span>✿</span><span>🌺</span><span>❀</span><span>🌻</span></div>
@@ -549,19 +542,9 @@
     </div>
   </div>
 
-  <!-- Manager edition: direct entry screen, bypassing employee registration and intro -->
-  <section id="managerDirectHome" dir="rtl" style="display:block;min-height:100vh;background:linear-gradient(135deg,#eaf7ef,#fff8e6);padding:clamp(22px,6vw,60px) 16px;box-sizing:border-box;text-align:center;">
-    <div style="max-width:850px;margin:0 auto;background:#fff;border:2px solid #d4af37;border-radius:26px;padding:clamp(24px,5vw,48px);box-shadow:0 15px 38px #006b3520;">
-      <img src="https://i.postimg.cc/tRm07wZF/MOTTO.png" alt="شعار المدرسة" style="display:block;width:100%;max-height:130px;object-fit:contain;margin:0 auto 18px;">
-      <h1 style="color:#006B35;font-size:clamp(25px,4vw,38px);font-weight:900;margin:8px 0;">نسخة المدير والإدارة</h1>
-      <p style="color:#52645a;font-size:clamp(15px,2vw,19px);margin:0;">اختر الدخول إلى لوحة المدير أو لوحة الإدارة</p>
-      <div style="height:3px;width:110px;background:#d4af37;border-radius:4px;margin:22px auto;"></div>
-    </div>
-  </section>
-
   <div class="secret-buttons" id="secretButtons">
-    <button class="secret-btn" id="principalRoleButton" onclick="askPassword('principal')">المدير</button>
-    <button class="secret-btn" id="adminRoleButton" onclick="askPassword('admin')" style="font-size: 0.8rem;">⚙️ إدارة</button>
+    <button class="secret-btn hidden" id="principalRoleButton" onclick="askPassword('principal')">المدير</button>
+    <button class="secret-btn hidden" id="adminRoleButton" onclick="askPassword('admin')" style="font-size: 0.8rem;">⚙️ إدارة</button>
   </div>
 
   <div id="approvalScreen" class="animated-wrapper hidden">
@@ -1436,8 +1419,16 @@
     } catch (_) { alert('تعذر الاتصال بالخادم.'); }
   }
 
-  // Manager edition: role buttons are displayed directly on entry; no hidden-logo reveal flow.
-
+  (function setupFiveLogoTaps() {
+    let taps = 0, timer = null;
+    const logos = document.querySelectorAll('.school-logo, .single-logo, #homeScreen img');
+    logos.forEach(el => el.addEventListener('click', () => {
+      taps++;
+      clearTimeout(timer);
+      timer = setTimeout(() => { taps = 0; }, 1800);
+      if (taps >= 5) { taps = 0; clearTimeout(timer); revealRoleIcons(); }
+    }));
+  })();
 
   function revealAllPasswords() {
     openPasswordModal("أدخل كلمة مرور الجوكر:", async (joker) => {
@@ -2780,7 +2771,7 @@
   <div id="pwaInstallOverlay" role="dialog" aria-modal="true" aria-labelledby="pwaInstallTitle"
        style="position:fixed;inset:0;z-index:200000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(10,24,43,.78);backdrop-filter:blur(5px)">
     <div style="width:min(440px,100%);background:#fff;border-radius:24px;padding:26px 22px;text-align:center;box-shadow:0 22px 70px #0005;color:#172033;direction:rtl">
-      <div aria-hidden="true" style="width:78px;height:78px;margin:0 auto 14px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#12345b,#18a6a0);color:white;font-size:38px"><img src="./master-icon-192.png" alt="أيقونة النظام" style="width:78px;height:78px;object-fit:contain;border-radius:20px" onerror="this.onerror=null;this.src='./master-icon-512.png';"></div>
+      <div aria-hidden="true" style="width:78px;height:78px;margin:0 auto 14px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#12345b,#18a6a0);color:white;font-size:38px"><img src="./icon-192.png" alt="أيقونة النظام" style="width:78px;height:78px;object-fit:contain;border-radius:20px" onerror="this.onerror=null;this.src='./icon-512.png';"></div>
       <h2 id="pwaInstallTitle" style="margin:0 0 10px;font-size:23px;color:#12345b">ثبّت نظام الاستئذان والإجازات</h2>
       <p style="line-height:1.8;margin:8px 0;color:#475569">ثبّت البرنامج على شاشة هاتفك للوصول إليه بسهولة من أيقونته.</p>
       <p id="pwaInstallHelp" style="font-size:13px;line-height:1.8;color:#64748b">إذا كان متصفحك يدعم التثبيت المباشر، يمكنك التثبيت الآن.</p>
