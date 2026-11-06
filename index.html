@@ -547,8 +547,6 @@
     <button class="secret-btn" onclick="askPassword('coordinator')">المنسق</button>
     <button class="secret-btn" onclick="askPassword('vp')">النائب الأكاديمي</button>
     <button class="secret-btn" onclick="askPassword('vp_admin')">النائب الإداري</button>
-    <button class="secret-btn hidden" id="principalRoleButton" onclick="askPassword('principal')">المدير</button>
-    <button class="secret-btn hidden" id="adminRoleButton" onclick="askPassword('admin')" style="font-size: 0.8rem;">⚙️ إدارة</button>
   </div>
 
   <div id="approvalScreen" class="animated-wrapper hidden">
@@ -1408,20 +1406,7 @@
     openPasswordModal("أدخل كلمة المرور:", runLogin);
   }
 
-  async function revealRoleIcons() {
-    const pass = prompt('أدخل كلمة مرور AUTH_ADMIN لإظهار أيقونتي المدير والإدارة:');
-    if (!pass) return;
-    try {
-      const fd = new URLSearchParams(); fd.set('action', 'revealRoleIcons'); fd.set('adminPassword', pass);
-      const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body: fd.toString() });
-      const out = await res.json();
-      if (!out || !out.success) { alert(out && out.message ? out.message : 'كلمة المرور غير صحيحة.'); return; }
-      roleIconsRevealToken = String(out.revealToken || '');
-      document.getElementById('principalRoleButton')?.classList.remove('hidden');
-      document.getElementById('adminRoleButton')?.classList.remove('hidden');
-      alert('تم إظهار أيقونتي المدير والإدارة. الدخول إليهما مباشر دون كلمة مرور إضافية.');
-    } catch (_) { alert('تعذر الاتصال بالخادم.'); }
-  }
+  async function revealRoleIcons() { alert('هذه نسخة الموظفين ولا تتضمن صلاحيات المدير أو الإدارة.'); }
 
   (function setupFiveLogoTaps() {
     let taps = 0, timer = null;
@@ -1430,7 +1415,7 @@
       taps++;
       clearTimeout(timer);
       timer = setTimeout(() => { taps = 0; }, 1800);
-      if (taps >= 5) { taps = 0; clearTimeout(timer); revealRoleIcons(); }
+      if (taps >= 5) { taps = 0; clearTimeout(timer); /* Client: no manager role reveal */ }
     }));
   })();
 
