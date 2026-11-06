@@ -1376,6 +1376,7 @@
         else { document.getElementById('approvalScreen').classList.remove('hidden'); document.getElementById('approvalTitle').innerText = currentRole === 'coordinator' ? 'اعتماد المنسق' : currentRole === 'vp_admin' ? 'اعتماد النائب الإداري' : currentRole === 'vp' ? 'اعتماد النائب الأكاديمي' : 'الاعتماد النهائي (المدير)'; }
       } catch (e) { alert('تعذر الاتصال بالخادم.'); }
     };
+    // Coordinator and both vice roles are passwordless; principal/admin only after icons are revealed.
     if (['principal','admin','coordinator','vp','vp_admin'].includes(role)) return runLogin('');
     openPasswordModal("أدخل كلمة المرور:", runLogin);
   }
