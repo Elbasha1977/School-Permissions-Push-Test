@@ -714,7 +714,6 @@
   </footer>
 
   <script>
-
   const API_URL = 'https://script.google.com/macros/s/AKfycbxszKD_QAdqHv75NVYvY4X9yCZ9dTkabZ4RdZUwIa9vApV5AuVxK6yv2dgX9IGItd0P6w/exec'; // TEST ONLY: never use the production deployment URL
   const VP_PHONE = ""; // Fill only with a test number if needed
   const PRINCIPAL_PHONE = ""; // Fill only with a test number if needed
@@ -1225,6 +1224,12 @@
       'العلوم الشرعية': ['شرعيه', 'اسلاميه', 'تربيه اسلاميه', 'دين']
     };
     const keys = aliases[subject] || [wanted];
+    // عند اختيار العلوم استبعد تخصصات العلوم الشرعية وتكنولوجيا المعلومات
+    // حتى لا تظهر أسماء من مواد أخرى بسبب وجود كلمة "علوم" في الوصف الوظيفي.
+    if (wanted === 'العلوم') {
+      const excludedScienceSpecialties = ['شرعي', 'اسلام', 'دين', 'تكنولوجيا', 'حاسوب', 'حوسبه', 'كمبيوتر', 'تقنيه معلومات', 'it'];
+      if (excludedScienceSpecialties.some(k => combined.includes(normalizeArabic_(k)))) return false;
+    }
     return isTeacherOrCoordinator(emp) && keys.some(k => combined.includes(normalizeArabic_(k)));
   }
 
