@@ -714,7 +714,8 @@
   </footer>
 
   <script>
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxs9sjxP4AIcVZ3nuu3mWGDys1w1Ws-Rmf3nErNOBaPpp8c1aN_F7Q1GW7Ki9ToE6GhtQ/exec'; // TEST ONLY: never use the production deployment URL
+
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxszKD_QAdqHv75NVYvY4X9yCZ9dTkabZ4RdZUwIa9vApV5AuVxK6yv2dgX9IGItd0P6w/exec'; // TEST ONLY: never use the production deployment URL
   const VP_PHONE = ""; // Fill only with a test number if needed
   const PRINCIPAL_PHONE = ""; // Fill only with a test number if needed
   const SUBJECTS = ["مدير المدرسة", "مساعد مدير المدرسة للشؤون الأكاديمية", "مساعد مدير المدرسة للشؤون الإدارية", "اللغة العربية", "اللغة الإنجليزية", "الرياضيات", "العلوم", "العلوم الاجتماعية", "الفنون البصرية", "التربية الرياضية", "تكنولوجيا المعلومات", "العلوم الشرعية"];
@@ -1215,12 +1216,13 @@
       'اللغة العربية': ['عربي', 'اللغه العربيه'],
       'اللغة الإنجليزية': ['انجليزي', 'انجليزيه', 'english'],
       'الرياضيات': ['رياضيات', 'math'],
+      // قوائم مستقلة: مادة العلوم لا تشمل العلوم الشرعية.
       'العلوم': ['علوم', 'science'],
       'العلوم الاجتماعية': ['اجتماعيه', 'اجتماعيات', 'دراسات اجتماعيه'],
       'الفنون البصرية': ['فنون', 'رسم', 'بصريه'],
       'التربية الرياضية': ['رياضيه', 'رياضه', 'بدنيه', 'تربيه بدنيه'],
       'تكنولوجيا المعلومات': ['تكنولوجيا', 'حاسوب', 'حوسبه', 'كمبيوتر', 'it'],
-      'العلوم الشرعية': ['شرعيه', 'اسلاميه', 'تربيه اسلاميه']
+      'العلوم الشرعية': ['شرعيه', 'اسلاميه', 'تربيه اسلاميه', 'دين']
     };
     const keys = aliases[subject] || [wanted];
     return isTeacherOrCoordinator(emp) && keys.some(k => combined.includes(normalizeArabic_(k)));
