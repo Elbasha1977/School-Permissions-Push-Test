@@ -560,6 +560,18 @@
         <p style="font-size:0.8rem;color:#856404;margin-top:10px;">💡 إذا كنت <strong>مقدم الطلب</strong>، اكتب رقم الطلب ورقمك الوظيفي واترك كلمة المرور فارغة — ستظهر لك لوحة إدارة البدلاء.</p>
         <p id="subLoginError" class="error-msg"></p>
       </div>
+      <div id="principalInboxPanel" class="hidden" style="margin:14px 0;padding:14px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;">
+        <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px;">
+          <h3 style="margin:0;color:var(--primary);">📥 الطلبات بانتظار اعتماد المدير</h3>
+          <button type="button" class="btn btn-outline btn-sm" onclick="loadPrincipalInbox()">🔄 تحديث القائمة</button>
+        </div>
+        <div id="principalInboxList"><p style="color:#64748b">جارٍ تحميل الطلبات...</p></div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;">
+          <button type="button" class="btn btn-success" onclick="approveSelectedPrincipalRequests()">✅ موافقة على المحدد</button>
+          <button type="button" class="btn btn-success" onclick="approveAllPrincipalRequests()">✅ موافقة على جميع الطلبات</button>
+          <span id="principalInboxMessage" style="font-weight:800"></span>
+        </div>
+      </div>
       <div id="searchBox">
         <div class="form-group">
           <label>أدخل رقم الطلب (مثال: REQ-1234)</label>
@@ -1396,7 +1408,7 @@
         resetApprovalScreenForLogin(); currentLeaveRequesterId = ''; currentLeaveEmp = null; leaveWhatsAppRequest = null; leaveWhatsAppRows = []; currentSubstituteSession = ''; currentRequesterSession = '';
         document.getElementById('employeePortal').classList.add('hidden'); document.getElementById('secretButtons').classList.add('hidden'); document.getElementById('substituteLoginBox').classList.add('hidden'); document.getElementById('requesterSubstitutesBox').classList.add('hidden'); document.getElementById('searchBox').classList.remove('hidden');
         if (currentRole === 'admin') { document.getElementById('adminDashboard').classList.remove('hidden'); loadStats(); renderEmployeesList(); }
-        else { document.getElementById('approvalScreen').classList.remove('hidden'); document.getElementById('approvalTitle').innerText = currentRole === 'coordinator' ? 'اعتماد المنسق' : currentRole === 'vp_admin' ? 'اعتماد النائب الإداري' : currentRole === 'vp' ? 'اعتماد النائب الأكاديمي' : 'الاعتماد النهائي (المدير)'; }
+        else { document.getElementById('approvalScreen').classList.remove('hidden'); document.getElementById('approvalTitle').innerText = currentRole === 'coordinator' ? 'اعتماد المنسق' : currentRole === 'vp_admin' ? 'اعتماد النائب الإداري' : currentRole === 'vp' ? 'اعتماد النائب الأكاديمي' : 'الاعتماد النهائي (المدير)'; const inbox=document.getElementById('principalInboxPanel'); if(inbox){inbox.classList.toggle('hidden',currentRole!=='principal'); if(currentRole==='principal') loadPrincipalInbox();} }
       } catch (e) { alert('تعذر الاتصال بالخادم.'); }
     };
     // Coordinator and both vice roles are passwordless; principal/admin only after icons are revealed.
@@ -1501,6 +1513,23 @@
     const tbody = document.getElementById('pdf-coverage-rows'); if (!tbody) return; const rows = getCoverageArray(data);
     if (rows.length) { tbody.innerHTML = rows.map((c,i)=>`<tr style="background:${i%2?'#f8fafc':'#fff'}"><td>${escapeHtml(c.substituteTeacher || c.substitute || '—')}</td><td>${escapeHtml(c.day || '—')}</td><td dir="ltr">${escapeHtml(c.date || '—')}</td><td style="font-weight:bold;">${escapeHtml(c.className || c.class || c.grade || 'لم يحدد')}</td><td>${escapeHtml(c.period || '—')}</td></tr>`).join(''); } else { const isAdmin = String(data.coverageType || '') === 'إداري' || String(data.subject || '') === 'كادر إداري'; tbody.innerHTML = `<tr><td colspan="5">${escapeHtml(data.coverage || (isAdmin ? data.adminCoverage : '') || 'لا توجد بيانات تغطية.')}</td></tr>`; }
   }
+
+  async function loadPrincipalInbox() {
+    const list=document.getElementById('principalInboxList'); const msg=document.getElementById('principalInboxMessage'); if(!list||currentRole!=='principal') return;
+    list.innerHTML='<p style="color:#64748b">جارٍ تحميل الطلبات...</p>'; if(msg) msg.textContent='';
+    try { const fd=new URLSearchParams(); fd.append('action','getRequests'); if(currentSessionToken) fd.append('sessionToken',currentSessionToken); const res=await fetch(API_URL,{method:'POST',body:fd,headers:{'Content-Type':'application/x-www-form-urlencoded'}}); const result=await res.json(); if(result&&result.code==='UNAUTHORIZED'){alert('انتهت الجلسة. أعد تسجيل الدخول.');backToHome();return;} if(!result.success) throw new Error(result.message||'تعذر تحميل الطلبات.');
+      const requests=(result.requests||[]).filter(d=>{const st=String(d.status||'').toLowerCase(); const principal=String(d.principalStatus||d.principal_status||'pending').toLowerCase(); const isAdminRequest=String(d.coverageType||'')==='إداري'||String(d.subject||'')==='كادر إداري'||String(d.approvalPath||'').includes('vp_admin'); const coordinator=String(d.coordinatorStatus||'').toLowerCase(); const vp=String(d.vpStatus||'').toLowerCase(); const vpAdmin=String(d.vpAdminStatus||'').toLowerCase(); const deputyReady=isAdminRequest?(vpAdmin==='approved'||st==='vp_admin_approved'||st==='vpadmin_approved'):(vp==='approved'||st==='vp_approved'); const coordinatorReady=isAdminRequest||coordinator==='approved'||st==='vp_approved'; return principal==='pending' && deputyReady && coordinatorReady && !st.includes('reject') && st!=='principal_approved';});
+      if(!requests.length){list.innerHTML='<p style="padding:12px;background:#fff;border-radius:8px;color:#64748b">لا توجد طلبات بانتظار اعتماد المدير حاليًا.</p>';return;}
+      list.innerHTML=`<div style="overflow-x:auto"><table class="data-table" style="width:100%;min-width:620px"><thead><tr><th><input type="checkbox" aria-label="تحديد الكل" onchange="togglePrincipalInboxAll(this.checked)"></th><th>رقم الطلب</th><th>مقدم الطلب</th><th>نوع الطلب</th><th>التاريخ / الفترة</th><th>الحالة</th><th>تفاصيل</th></tr></thead><tbody>${requests.map(d=>{const id=String(d.requestId||'');const packed=encodeURIComponent(JSON.stringify(d)); const isLeave=String(d.permissionType||'')==='طلب إجازة'; let date=escapeHtml(d.date||''); if(isLeave){try{const ld=typeof d.coverageDetails==='string'?JSON.parse(d.coverageDetails||'{}'):(d.coverageDetails||{});date=escapeHtml((ld.startDate||'')+' إلى '+(ld.endDate||''));}catch(_){}} return `<tr><td><input class="principalInboxCheck" type="checkbox" value="${escapeHtml(id)}" aria-label="تحديد ${escapeHtml(id)}"></td><td dir="ltr">${escapeHtml(id)}</td><td>${escapeHtml(d.name||'')}</td><td>${isLeave?'إجازة':'استئذان'}</td><td>${date}</td><td><span style="background:#e88916;color:white;padding:4px 9px;border-radius:15px;font-weight:800">تحت الإجراء</span></td><td><button type="button" class="btn btn-primary btn-sm" onclick="openPrincipalInboxDetails('${packed}')">تفاصيل</button></td></tr>`;}).join('')}</tbody></table></div>`;
+    } catch(e){list.innerHTML=`<p class="error-msg">${escapeHtml(e.message||'تعذر تحميل القائمة.')}</p>`;}
+  }
+  function togglePrincipalInboxAll(checked){document.querySelectorAll('.principalInboxCheck').forEach(c=>c.checked=!!checked);}
+  function openPrincipalInboxDetails(packed){try{const d=JSON.parse(decodeURIComponent(packed));const input=document.getElementById('searchReqId');input.value=String(d.requestId||'');fetchRequest();document.getElementById('requestDetails')?.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){alert('تعذر فتح تفاصيل الطلب.');}}
+  async function approvePrincipalInboxIds(ids){if(currentRole!=='principal')return alert('هذه الخاصية متاحة للمدير فقط.');if(!ids.length)return alert('حدد طلبًا واحدًا على الأقل.');if(!confirm(`سيتم تسجيل الموافقة النهائية على ${ids.length} طلب/طلبات، كل طلب على حدة. هل تريد المتابعة؟`))return;const msg=document.getElementById('principalInboxMessage');if(msg){msg.textContent='جارٍ اعتماد الطلبات...';msg.style.color='#b45309';}let done=0,failed=[];
+    for(const reqId of ids){try{const getfd=new URLSearchParams();getfd.append('action','getRequest');getfd.append('reqId',reqId);const gr=await fetch(API_URL,{method:'POST',body:getfd,headers:{'Content-Type':'application/x-www-form-urlencoded'}});const gd=await gr.json();if(!gd.success||!gd.data)throw new Error(gd.message||'لم يتم جلب الطلب');const data=gd.data;const fd=new URLSearchParams();fd.append('action','updateStatus');fd.append('reqId',reqId);fd.append('role','principal');fd.append('decision','approved');if(currentSessionToken)fd.append('sessionToken',currentSessionToken);const ar=await fetch(API_URL,{method:'POST',body:fd,headers:{'Content-Type':'application/x-www-form-urlencoded'}});const result=await ar.json();if(!result.success)throw new Error(result.message||'فشل الاعتماد');done++;try{if(!Array.isArray(ALL_EMPLOYEES)||!ALL_EMPLOYEES.length)await loadAllEmployees();sendAutoWhatsApp(data.phone||'',reqId,'مقدم الطلب','principal',data,result.newStatus||'principal_approved');}catch(_){} }catch(e){failed.push(reqId+': '+(e.message||'تعذر الاعتماد'));}}
+    if(msg){msg.textContent=`تم اعتماد ${done} طلب${failed.length?`، وتعذر اعتماد ${failed.length}`:''}.`;msg.style.color=failed.length?'#b91c1c':'#15803d';}await loadPrincipalInbox();}
+  function approveSelectedPrincipalRequests(){const ids=[...document.querySelectorAll('.principalInboxCheck:checked')].map(c=>c.value).filter(Boolean);approvePrincipalInboxIds(ids);}
+  function approveAllPrincipalRequests(){const ids=[...document.querySelectorAll('.principalInboxCheck')].map(c=>c.value).filter(Boolean);approvePrincipalInboxIds(ids);}
 
   async function fetchRequest() {
     const reqInput = document.getElementById('searchReqId');
@@ -2673,7 +2702,7 @@
     showTrackingScreen, trackRequest, verifyEmp, calcDuration, submitRequest,
     sendWhatsApp, askPassword, revealAllPasswords, fetchRequest, approveRequest, sendAutoWhatsApp,
     hideAllTrackBtns, checkBalanceState,
-    loadStats, loadRequestDetails, showAdminRequestDetails,
+    loadStats, loadRequestDetails, showAdminRequestDetails, loadPrincipalInbox, togglePrincipalInboxAll, openPrincipalInboxDetails, approveSelectedPrincipalRequests, approveAllPrincipalRequests,
     switchAdminTab, renderEmployeesList,
     openAddEmployeeForm, openEditEmployeeForm, closeEmployeeForm,
     saveEmployee, deleteEmployee,
