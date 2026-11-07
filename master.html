@@ -1579,7 +1579,11 @@
       const hasSubstituteApprovals = Array.isArray(approvalList) && approvalList.length > 0;
       const isRequesterView = currentRole === 'requester' || (currentLeaveRequesterId && String(currentLeaveRequesterId) === String(result.data.employeeId || result.data.empId || ''));
       const privilegedApprovalView = ['coordinator','vp','vp_admin','principal'].includes(currentRole);
-      if (hasSubstituteApprovals && !isRequesterView) {
+      // لا تُعرض موافقات البدلاء في طلبات الإجازات؛ الإجازة لا تتضمن حصصًا أو بدلاء.
+      if (isLeaveRequest) {
+        approvalBox.style.display = 'none';
+        approvalBox.textContent = '';
+      } else if (hasSubstituteApprovals && !isRequesterView) {
         approvalBox.style.display = 'block';
         approvalBox.innerHTML = '<strong>آراء البدلاء (للمسؤولين):</strong><br>' + approvalList.map(a => `${escapeHtml(a.name || a.substituteName || 'البديل')} — ${a.status === 'approved' ? '✅ موافق' : a.status === 'rejected' ? '❌ مرفوض' : '⏳ بانتظار الموافقة'}${a.reason ? `<br><span style="color:#b91c1c">سبب الرفض: ${escapeHtml(a.reason)}</span>` : ''}`).join('<br>');
       } else if (hasSubstituteApprovals && isRequesterView) {
