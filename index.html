@@ -800,7 +800,7 @@
     const home = document.getElementById('homeScreen');
     if (home) home.style.display = 'block';
     const secretButtons = document.getElementById('secretButtons');
-    if (secretButtons) { secretButtons.classList.remove('hidden'); secretButtons.style.display = 'flex'; }
+    if (secretButtons) { secretButtons.classList.remove('hidden'); secretButtons.style.display = 'flex'; secretButtons.querySelector('button[onclick=\"enterSubstituteApproval()\"]')?.classList.remove('hidden'); }
     ['empIdInput','leaveEmployeeId','trackReqId','searchReqId','leaveLandingTrackId','leaveTrackReqId'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     ['loginError','leaveLoginError','leaveLandingTrackStatus','leaveTrackStatus'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = ''; });
     currentLeaveRequesterId = ''; currentLeaveEmp = null; currentLeaveSummary = null; currentLeaveRequestId = ''; leaveWhatsAppRequest = null; leaveWhatsAppRows = []; currentTrackedData = null;
@@ -910,6 +910,7 @@
   }
 
   function openPermissionApp() {
+    document.getElementById('secretButtons')?.querySelector('button[onclick=\"enterSubstituteApproval()\"]')?.classList.remove('hidden');
     document.getElementById('homeScreen').style.display = 'none';
     const portal = document.getElementById('employeePortal');
     portal.classList.remove('hidden'); portal.style.display = 'flex';
@@ -920,6 +921,7 @@
   }
 
   function openLeaveApp() {
+    document.getElementById('secretButtons')?.querySelector('button[onclick=\"enterSubstituteApproval()\"]')?.classList.add('hidden');
     document.getElementById('homeScreen').style.display = 'none';
     const portal = document.getElementById('employeePortal');
     portal.classList.remove('hidden'); portal.style.display = 'flex';
